@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>595</width>
-    <height>532</height>
+    <height>474</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,8 +51,26 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QComboBox" name="_listPath"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="_addData">
+     <property name="text">
+      <string>AddData</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="_showImage">
+     <property name="text">
+      <string>Show Image</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
  <connections/>
 </ui>
+
