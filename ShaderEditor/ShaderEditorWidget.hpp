@@ -1,7 +1,10 @@
 #pragma once
 
 #include <QWidget>
+#pragma once
 
+#include <QWidget>
+#include <QString>
 namespace Ui {
 class ShaderEditorWidget;
 }
@@ -31,11 +34,16 @@ public:
 
 private slots:
     void updateShadersFromUI();
+    void loadData();
+    void showImage();
 
 private:
     Ui::ShaderEditorWidget *ui;
     std::shared_ptr< Ra::Engine::RenderObject > _ro;
     Ra::Engine::Renderer * _renderer;
     std::shared_ptr< Ra::Engine::ShaderParameterProvider > _paramProvider;
+    std::string _path;
 };
+
+
 
