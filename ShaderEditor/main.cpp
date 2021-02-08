@@ -24,7 +24,8 @@
 // Qt
 #include <QTimer>
 #include <QDockWidget>
-
+#include <QImage>
+#include <QImageReader>
 /**
  * Demonstrate the usage of RawShaderMaterial functionalities
  */
@@ -32,22 +33,28 @@
 const std::string _vertexShaderSource {"#include \"TransformStructs.glsl\"\n"
                                        "layout (location = 0) in vec3 in_position;\n"
                                        "layout (location = 0) out vec3 out_pos;\n"
+                                       "layout (location = 1) in vec2 texCoordIn;\n"
+                                       "layout (location = 1) out vec2 texCoordOut;\n"
                                        "uniform Transform transform;\n"
                                        "void main(void)\n"
                                        "{\n"
                                        "    mat4 mvp    = transform.proj * transform.view;\n"
                                        "    out_pos     = in_position;\n"
                                        "    gl_Position = mvp*vec4(in_position.xyz, 1.0);\n"
+                                       "    texCoordOut = texCoordIn;\n"
                                        "}\n"};
 // Fragment shader source code
 const std::string _fragmentShaderSource {
     "layout (location = 0) in  vec3 in_pos;\n"
     "layout (location = 0) out vec4 out_color;\n"
+    "layout (location = 1) in vec2 texCoordOut;\n"
     "uniform vec4 aColorUniform;\n"
     "uniform float aScalarUniform;\n"
+    "uniform sampler2D aTextureUniform;\n"
     "void main(void)\n"
     "{\n"
     "    out_color =  ( 1 + cos( 20 * ( in_pos.x + aScalarUniform ) ) ) * 0.5 * aColorUniform;\n"
+    "    out_color = texture(aTextureUniform,  texCoordOut);\n"
     "}\n"};
 
 
@@ -94,18 +101,14 @@ std::shared_ptr<Ra::Engine::RenderObject> initQuad( Ra::GuiBase::BaseApplication
 }
 
 int main( int argc, char* argv[] ) {
-    Ra::GuiBase::BaseApplication app( argc, argv );
-    app.initialize( Ra::GuiBase::SimpleWindowFactory {} );
-
+    Ra::GuiBase::BaseApplication app( argc, argv, Ra::GuiBase::SimpleWindowFactory{} );
     //! [add the custom material to the material system]
     Ra::Engine::RawShaderMaterial::registerMaterial();
 
     auto ro = initQuad( app );
-
     auto viewer = app.m_mainWindow->getViewer();
     viewer->setCameraManipulator(
         new CameraManipulator2D( *( viewer->getCameraManipulator() ) ) );
-
     QDockWidget* dock = new QDockWidget("Shaders editor");
     dock->setWidget( new ShaderEditorWidget(defaultConfig[0].second, defaultConfig[1].second, ro, viewer->getRenderer(), paramProvider, dock) );
     app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
