@@ -64,12 +64,13 @@ const ShaderConfigType defaultConfig {
     {Ra::Engine::ShaderType::ShaderType_FRAGMENT, _fragmentShaderSource}};
 
 auto paramProvider = std::make_shared<MyParameterProvider>();
-
+Ra::Engine::TextureManager textureManager;
 
 /**
  * Generate a quad with a ShaderMaterial attached
  * @param app
  * @return The renderObject associated to the created component.
+ *
  */
 std::shared_ptr<Ra::Engine::RenderObject> initQuad( Ra::GuiBase::BaseApplication& app ) {
     //! [Creating the quad]
@@ -79,9 +80,11 @@ std::shared_ptr<Ra::Engine::RenderObject> initQuad( Ra::GuiBase::BaseApplication
     auto e = app.m_engine->getEntityManager()->createEntity( "Quad Entity" );
 
     //! [Create Parameter provider for the shader]
+
     paramProvider->setOrComputeTheParameterValues();
 
     //! [Create the shader material]
+    //!
     Ra::Core::Asset::RawShaderMaterialData mat {"Quad Material", defaultConfig, paramProvider};
 
     //! [Create a geometry component using the custom material]
@@ -110,7 +113,7 @@ int main( int argc, char* argv[] ) {
     viewer->setCameraManipulator(
         new CameraManipulator2D( *( viewer->getCameraManipulator() ) ) );
     QDockWidget* dock = new QDockWidget("Shaders editor");
-    dock->setWidget( new ShaderEditorWidget(defaultConfig[0].second, defaultConfig[1].second, ro, viewer->getRenderer(), paramProvider, dock) );
+    dock->setWidget( new ShaderEditorWidget(defaultConfig[0].second, defaultConfig[1].second, ro, viewer->getRenderer(), paramProvider,textureManager, dock) );
     app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
 
     return app.exec();
