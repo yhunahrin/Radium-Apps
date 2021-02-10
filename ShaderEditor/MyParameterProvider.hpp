@@ -19,24 +19,33 @@ class MyParameterProvider : public Ra::Engine::ShaderParameterProvider
         // The name of the parameter corresponds to the shader's uniform name.
         m_renderParameters.addParameter( "aColorUniform", m_colorParameter );
         m_renderParameters.addParameter( "aScalarUniform", m_scalarParameter );
+        Ra::Engine::TextureManager tmp;
+        Ra::Engine::TextureParameters tmp1;
+        tmp1.name = m_path;
+        m_textureParameter = tmp.loadTexture(tmp1);
         m_renderParameters.addParameter( "aTextureUniform", m_textureParameter);
+    }
+    std::string getPath(){
+        return m_path;
+    }
+    void setPath(std::string path){
+        m_path = path;
     }
     void setOrComputeTheParameterValues() {
         // client side computation of the parameters, e.g.
         m_colorParameter  = Ra::Core::Utils::Color::Red();
         m_scalarParameter = .1_ra;
+        m_path = "C:/Users/aduongng/Desktop/TP_VO/20703106.jpg";
         Ra::Engine::TextureManager tmp;
         Ra::Engine::TextureParameters tmp1;
-       // QImageReader reader;
-     //   reader.setFileName("C:\\Users\\aduongng\\Desktop\\TP_VO\\20703106.jpg");
-     //   QImage image = reader.read();
         //tmp1.name = "C:\\Users\\aduongng\\Deskto\\TP_VO\\20703106.jpg";
-        tmp1.name = "C:\\Users\\aduongng\\Desktop\\TP_VO\\20703106.jpg";
-        //tmp1.width = image.width();
-       // tmp1.height = image.height();
-      //  tmp1 = tmp.addTexture("C:\\Users\\aduongng\\Desktop\\TP_VO\\20703106.jpg", tmp1.width, tmp1.height,tmp1.texels);
+
+        tmp1.name = m_path;
+        //tmp1 = tmp.addTexture(tmp1.name, tmp1.width, tmp1.height,tmp1.texels);
       //  tmp.loadTextureImage(tmp1);
          m_textureParameter = tmp.loadTexture(tmp1);
+        // m_textureParameter = tmp.getOrLoadTexture(tmp1);
+
       //   m_textureParameter = tmp1.name = "C:\\Users\\aduongng\\Desktop\\TP_VO\\20703106.jpg";
        //tmp.getOrLoadTexture(tmp1);
        /* int w,h;
@@ -49,8 +58,8 @@ class MyParameterProvider : public Ra::Engine::ShaderParameterProvider
     Ra::Core::Utils::Color m_colorParameter {Ra::Core::Utils::Color::Green()};
     Scalar m_scalarParameter {1};
     Ra::Engine::Texture * m_textureParameter{};
+    std::string m_path {"C:\\Users\\aduongng\\Desktop\\TP_VO\\20703106.jpg"};
 };
-
 
 
 
