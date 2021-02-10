@@ -32,12 +32,16 @@ ShaderEditorWidget::ShaderEditorWidget(
                                 std::shared_ptr< Ra::Engine::RenderObject > ro,
                                 Ra::Engine::Renderer * renderer,
                                 std::shared_ptr< Ra::Engine::ShaderParameterProvider > paramProvider,
+                                Ra::Engine::TextureManager textureManager,
+                               
                                 QWidget *parent) :
     QWidget( parent ),
     ui( new Ui::ShaderEditorWidget ),
     _ro( ro ),
     _renderer( renderer ),
-    _paramProvider( paramProvider )
+    _paramProvider(paramProvider),
+    _textureManager(textureManager)
+
 {
     ui->setupUi(this);
     ui->_vertShaderEdit->setPlainText( QString::fromStdString( v ) );
@@ -99,7 +103,8 @@ void ShaderEditorWidget::showImage()
  QImage image = reader.read();
       for(int i=0;i<image.width();i++) {
           for(int j=0;j<image.height();j++) {
-              std::cout<<qRed(image.pixel(i,j))<<std::endl;
+             // std::cout<<qRed(image.pixel(i,j))<<std::endl;
           }
       }
 }
+
