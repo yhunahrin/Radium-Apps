@@ -10,17 +10,21 @@
 // include the custom material definition
 #include <Engine/Renderer/Material/RawShaderMaterial.hpp>
 
-#include <QColorDialog>
-#include <QComboBox>
-#include <QFileDialog>
-#include <QSettings>
-#include <QToolButton>
-#include <iostream>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QString>
 #include <QTextEdit>
 #include <QMenu>
+#include <QImageReader>
+
+#include <QColorDialog>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QPushButton>
+#include <QSettings>
+#include <QToolButton>
+#include <iostream>
+#include <QMessageBox>
+#include <QImage>
 #include <QImageReader>
 ShaderEditorWidget::ShaderEditorWidget(
                                 const std::string& v,
@@ -71,7 +75,6 @@ void ShaderEditorWidget::loadData()
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::Yes);
     int res = msgBox.exec();
-   ;
     if (res==QMessageBox::Yes){
         QString path  = settings.value( "files/load", QDir::homePath()).toString();
         QStringList pathList = QFileDialog::getOpenFileNames( this, "Open Files", path,tr("Image files (*.jpg *.png *.bmp)") );
@@ -91,5 +94,12 @@ void ShaderEditorWidget::loadData()
 void ShaderEditorWidget::showImage()
 {
  std::cout<<ui->_listPath->currentText().toStdString()<<std::endl;
+ QImageReader reader;
+ reader.setFileName(ui->_listPath->currentText());
+ QImage image = reader.read();
+      for(int i=0;i<image.width();i++) {
+          for(int j=0;j<image.height();j++) {
+              std::cout<<qRed(image.pixel(i,j))<<std::endl;
+          }
+      }
 }
-
