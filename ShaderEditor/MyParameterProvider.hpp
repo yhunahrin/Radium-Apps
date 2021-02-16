@@ -1,17 +1,6 @@
-#pragma once
-
-#include <Engine/Renderer/RenderTechnique/RenderParameters.hpp>
-#include <Engine/Renderer/Texture/Texture.hpp>
-#include <Engine/Renderer/Texture/TextureManager.hpp>
-#include <QImageReader>
-#include <QSettings>
-#include <QString>
-
-using ShaderConfigType = std::vector<std::pair<Ra::Engine::ShaderType, std::string>> ;
-
-class MyParameterProvider : public Ra::Engine::ShaderParameterProvider
+class MyParameterProvider :public Ra::Engine::ShaderParameterProvider
 {
- public:
+  public:
     MyParameterProvider() {}
     ~MyParameterProvider() {}
     void updateGL() override {
@@ -32,7 +21,6 @@ class MyParameterProvider : public Ra::Engine::ShaderParameterProvider
         m_colorParameter  = Ra::Core::Utils::Color::Red();
         m_scalarParameter = .1_ra;
         m_path = "C:\\Users\\aduongng\\Desktop\\TP_VO\\20703106.jpg";
-        m_textureManager.getOrLoadTexture(m_textureManager.addTexture(m_path,0,0,nullptr));
     }
 
   private:
