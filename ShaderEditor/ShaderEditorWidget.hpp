@@ -26,8 +26,8 @@ public:
                                 const std::string& f,
                                 std::shared_ptr< Ra::Engine::RenderObject > ro,
                                 Ra::Engine::Renderer * renderer,
+                                std::string path,
                                 std::shared_ptr< Ra::Engine::ShaderParameterProvider > paramProvider,
-                                Ra::Engine::TextureManager _textureManager,
                                 QWidget *parent = nullptr);
     ~ShaderEditorWidget();
 
@@ -40,8 +40,7 @@ private:
     Ui::ShaderEditorWidget *ui;
     std::shared_ptr< Ra::Engine::RenderObject > _ro;
     Ra::Engine::Renderer * _renderer;
-    std::shared_ptr< Ra::Engine::ShaderParameterProvider > _paramProvider;
-    Ra::Engine::TextureManager _textureManager;
     std::string _path;
+    std::shared_ptr< Ra::Engine::ShaderParameterProvider > _paramProvider;
 };
 
