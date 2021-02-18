@@ -31,16 +31,15 @@ ShaderEditorWidget::ShaderEditorWidget(
                                 const std::string& f,
                                 std::shared_ptr< Ra::Engine::RenderObject > ro,
                                 Ra::Engine::Renderer * renderer,
+                                std::string path,
                                 std::shared_ptr< Ra::Engine::ShaderParameterProvider > paramProvider,
-                                Ra::Engine::TextureManager textureManager,
-                               
                                 QWidget *parent) :
     QWidget( parent ),
     ui( new Ui::ShaderEditorWidget ),
     _ro( ro ),
     _renderer( renderer ),
-    _paramProvider(paramProvider),
-    _textureManager(textureManager)
+    _path(path),
+    _paramProvider(paramProvider)
 
 {
     ui->setupUi(this);
@@ -64,7 +63,6 @@ void ShaderEditorWidget::updateShadersFromUI()
     const ShaderConfigType config {
        {Ra::Engine::ShaderType::ShaderType_VERTEX,   ui->_vertShaderEdit->toPlainText().toStdString()},
        {Ra::Engine::ShaderType::ShaderType_FRAGMENT, ui->_fragShaderEdit->toPlainText().toStdString()}};
-
     auto mat           = static_cast<Ra::Engine::RawShaderMaterial*>( _ro->getMaterial().get() );
     mat->updateShaders( config, _paramProvider );
     _renderer->buildRenderTechnique( _ro.get() );
@@ -97,14 +95,12 @@ void ShaderEditorWidget::loadData()
 
 void ShaderEditorWidget::showImage()
 {
- std::cout<<ui->_listPath->currentText().toStdString()<<std::endl;
- QImageReader reader;
- reader.setFileName(ui->_listPath->currentText());
- QImage image = reader.read();
-      for(int i=0;i<image.width();i++) {
-          for(int j=0;j<image.height();j++) {
-             // std::cout<<qRed(image.pixel(i,j))<<std::endl;
-          }
-      }
+    QImageReader reader;
+    reader.setFileName(ui->_listPath->currentText());
+    QImage image = reader.read();
+    Ra::Engine::TextureParameters tmp1;
+    _path = ui->_listPath->currentText().toStdString();
+    std::cout<<_path<<std::endl;
+    this->updateShadersFromUI();
 }
 
