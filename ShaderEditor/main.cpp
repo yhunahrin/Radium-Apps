@@ -18,7 +18,7 @@
 #include "CameraManipulator.hpp"
 #include "ShaderEditorWidget.hpp"
 #include "MyParameterProvider.hpp"
-
+#include "MeshPaintUI.h"
 #include <string>
 
 // Qt
@@ -62,10 +62,8 @@ const std::string _fragmentShaderSource {
 const ShaderConfigType defaultConfig {
     {Ra::Engine::ShaderType::ShaderType_VERTEX, _vertexShaderSource},
     {Ra::Engine::ShaderType::ShaderType_FRAGMENT, _fragmentShaderSource}};
-
+std::string path = "C:/Users/aduongng/Desktop/project/ex.bmp";
 auto paramProvider = std::make_shared<MyParameterProvider>();
-Ra::Engine::TextureManager textureManager;
-
 /**
  * Generate a quad with a ShaderMaterial attached
  * @param app
@@ -80,11 +78,10 @@ std::shared_ptr<Ra::Engine::RenderObject> initQuad( Ra::GuiBase::BaseApplication
     auto e = app.m_engine->getEntityManager()->createEntity( "Quad Entity" );
 
     //! [Create Parameter provider for the shader]
-
-    paramProvider->setOrComputeTheParameterValues();
-
+    paramProvider->setOrComputeTheParameterValues(path);
     //! [Create the shader material]
     //!
+
     Ra::Core::Asset::RawShaderMaterialData mat {"Quad Material", defaultConfig, paramProvider};
 
     //! [Create a geometry component using the custom material]
@@ -93,7 +90,6 @@ std::shared_ptr<Ra::Engine::RenderObject> initQuad( Ra::GuiBase::BaseApplication
     //! [Register the entity/component association to the geometry system ]
     auto system = app.m_engine->getSystem( "GeometrySystem" );
     system->addComponent( e, c );
-
     //![get the renderobject for further edition]
     auto ro = Ra::Engine::RadiumEngine::getInstance()->getRenderObjectManager()->getRenderObject(
         c->m_renderObjects[0] );
@@ -113,8 +109,7 @@ int main( int argc, char* argv[] ) {
     viewer->setCameraManipulator(
         new CameraManipulator2D( *( viewer->getCameraManipulator() ) ) );
     QDockWidget* dock = new QDockWidget("Shaders editor");
-    dock->setWidget( new ShaderEditorWidget(defaultConfig[0].second, defaultConfig[1].second, ro, viewer->getRenderer(), paramProvider,textureManager, dock) );
+    dock->setWidget( new ShaderEditorWidget(defaultConfig[0].second, defaultConfig[1].second, ro, viewer->getRenderer(),path, paramProvider, dock) );
     app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
-
     return app.exec();
 }
