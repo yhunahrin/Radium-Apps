@@ -1,3 +1,14 @@
+#pragma once
+
+#include <Engine/Renderer/RenderTechnique/RenderParameters.hpp>
+#include <Engine/Renderer/Texture/Texture.hpp>
+#include <Engine/Renderer/Texture/TextureManager.hpp>
+#include <QImageReader>
+#include <QSettings>
+#include <QString>
+
+using ShaderConfigType = std::vector<std::pair<Ra::Engine::ShaderType, std::string>> ;
+
 class MyParameterProvider :public Ra::Engine::ShaderParameterProvider
 {
   public:
@@ -13,14 +24,11 @@ class MyParameterProvider :public Ra::Engine::ShaderParameterProvider
     std::string getPath(){
         return m_path;
     }
-    void setPath(std::string path){
-        m_path = path;
-    }
-    void setOrComputeTheParameterValues() {
+    void setOrComputeTheParameterValues(std::string path) {
         // client side computation of the parameters, e.g.
         m_colorParameter  = Ra::Core::Utils::Color::Red();
         m_scalarParameter = .1_ra;
-        m_path = "C:\\Users\\aduongng\\Desktop\\TP_VO\\20703106.jpg";
+        m_path = path;
     }
 
   private:
@@ -29,12 +37,6 @@ class MyParameterProvider :public Ra::Engine::ShaderParameterProvider
     Ra::Engine::TextureManager m_textureManager{};
     std::string m_path {""};
 };
-
-
-
-
-
-
 
 
 
