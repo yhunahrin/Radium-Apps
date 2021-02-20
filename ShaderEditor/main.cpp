@@ -19,6 +19,7 @@
 #include "ShaderEditorWidget.hpp"
 #include "MyParameterProvider.hpp"
 #include "MeshPaintUI.h"
+#include "Segmentation.h"
 #include <string>
 
 // Qt
@@ -100,7 +101,7 @@ std::shared_ptr<Ra::Engine::RenderObject> initQuad( Ra::GuiBase::BaseApplication
 }
 
 int main( int argc, char* argv[] ) {
-    Ra::GuiBase::BaseApplication app( argc, argv, Ra::GuiBase::SimpleWindowFactory{} );
+    /*Ra::GuiBase::BaseApplication app( argc, argv, Ra::GuiBase::SimpleWindowFactory{} );
     //! [add the custom material to the material system]
     Ra::Engine::RawShaderMaterial::registerMaterial();
 
@@ -110,6 +111,25 @@ int main( int argc, char* argv[] ) {
         new CameraManipulator2D( *( viewer->getCameraManipulator() ) ) );
     QDockWidget* dock = new QDockWidget("Shaders editor");
     dock->setWidget( new ShaderEditorWidget(defaultConfig[0].second, defaultConfig[1].second, ro, viewer->getRenderer(),path, paramProvider, dock) );
-    app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
+    app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);*/
+  //  Ra::GuiBase::BaseApplication app( argc, argv,Ra::GuiBase::SimpleWindowFactory{} );
+    /*auto viewer = app.m_mainWindow->getViewer();
+    viewer->setCameraManipulator(
+        new CameraManipulator2D( *( viewer->getCameraManipulator() ) ) );
+      */
+   // QDockWidget* dock = new QDockWidget("Segmentation");
+    //QMainWindow* a = new QMainWindow(app)
+   // dock->setWidget(new Segmentation(dock) );
+    //app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
+      QApplication app(argc, argv);
+
+      Segmentation window;
+
+      window.setGeometry(300, 300,800, 600);
+      window.setWindowTitle("Segmentation");
+      window.show();
+
+
+
     return app.exec();
 }
