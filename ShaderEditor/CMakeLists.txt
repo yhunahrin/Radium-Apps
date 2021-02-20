@@ -30,16 +30,22 @@ set(CMAKE_AUTORCC ON)
 set(app_sources
         main.cpp
         ShaderEditorWidget.cpp
+        MeshPaintUI.cpp
+        Segmentation.cpp
     )
 
 set(app_headers
     CameraManipulator.hpp
     ShaderEditorWidget.hpp
     MyParameterProvider.hpp
+    MeshPaintUI.h
+    Segmentation.h
    )
 
 set(app_uis
     ShaderEditorWidget.ui
+    MeshPaintUI.ui
+    Segmentation.ui
    )
 
 qt5_wrap_ui(app_uis_moc ${app_uis})
