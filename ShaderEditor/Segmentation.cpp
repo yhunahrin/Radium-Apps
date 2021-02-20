@@ -35,7 +35,7 @@ Segmentation::Segmentation(QWidget *parent) : QMainWindow(parent),ui( new Ui::Se
 {
     ui->setupUi(this);
     ui->label_3->setText("100");
-    ui->size->setRange(12.5, 600);
+    ui->size->setRange(50, 600);
     ui->size->setValue(100);
     ui->saveImage->setEnabled(false);
     ui->saveAsImage->setEnabled(false);
@@ -62,6 +62,7 @@ Segmentation::Segmentation(QWidget *parent) : QMainWindow(parent),ui( new Ui::Se
     connect( ui->saveAsImage, &QAction::triggered, this, & Segmentation::saveAsImage);
     connect( ui->quitApp, &QAction::triggered, this, & Segmentation::quit);
     connect( ui->pushButton, &QPushButton::clicked, this, & Segmentation::showImage );
+    connect(ui->size, SIGNAL(valueChanged(int)), this, SLOT(zoom(int)));
 
 }
 
@@ -91,6 +92,7 @@ void Segmentation::loadImageTest()
             pathListFull.append(directory.path()+"/"+pathList.at(i));
         }
         ui->comboBox->addItems(pathListFull);
+        ui->size->setValue(100);
     }
 }
 void Segmentation::saveImage()
@@ -125,6 +127,9 @@ void Segmentation::showImage()
     ui->label_2->setPixmap(image);
     ui->saveImage->setEnabled(true);
     ui->saveAsImage->setEnabled(true);
+    haveImage = true;
+    ui->label_3->setText("100");
+
 
 }
 void Segmentation::quit()
@@ -150,7 +155,19 @@ void Segmentation::colorWhite()
 {
 
 }
-void Segmentation::zoom()
+void Segmentation::zoom(int k)
 {
+   ui->label_3->setText(QString::number(k));
+   int width = (ui->listView->width()*k/100);
+   int height = ui->listView->height()*k/100;
+   ui->listView->resize(width,height);
+   ui->label_2->resize(width,height);
+   if(haveImage){
+       QImageReader reader;
+       reader.setFileName(path);
+       QImage _image = reader.read();
+       QImage img2 = _image.scaled(width, height, Qt::IgnoreAspectRatio);
+       ui->label_2->setPixmap(QPixmap::fromImage(img2));
+   }
 
 }
