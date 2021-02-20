@@ -40,12 +40,13 @@ private slots:
     void draw();
     void colorBlack();
     void colorWhite();
-    void zoom();
+    void zoom(int value);
 private:
     Ui::Segmentation *ui;
     QString path;
     QPixmap image;
     QColor color;
+    bool haveImage = false;
 
 };
 #endif // SEGEMENTATION_H
