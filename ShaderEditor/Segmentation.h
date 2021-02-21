@@ -7,6 +7,9 @@
 #include <QString>
 #include <Engine/Renderer/Texture/TextureManager.hpp>
 #include <QLabel>
+#include <QPainter>
+#include <QLine>
+#include <QMouseEvent>
 namespace Ui {
 class Segmentation;
 }
@@ -29,7 +32,12 @@ class Segmentation : public QMainWindow
 public:
     explicit Segmentation(QWidget *parent = nullptr);
     ~Segmentation();
-
+protected:
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void paintEvent(QPaintEvent *);
+    void draw( QPainter &paint);
 private slots:
     void loadImageTest();
     void saveImage();
@@ -37,16 +45,21 @@ private slots:
     void loadData();
     void showImage();
     void quit();
-    void draw();
     void colorBlack();
     void colorWhite();
     void zoom(int value);
+    void zoomLarge();
+    void zoomSmall();
+    void drawPen();
 private:
     Ui::Segmentation *ui;
     QString path;
     QPixmap image;
     QColor color;
     bool haveImage = false;
+    bool drawing=false;
+    QVector<QPoint> pt1;                         // point array
+    QVector<QPoint> pt2;
 
 };
 #endif // SEGEMENTATION_H
