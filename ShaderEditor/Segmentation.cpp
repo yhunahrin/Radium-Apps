@@ -30,6 +30,7 @@
 #include <QMenu>
 #include <QToolBar>
 #include <QSlider>
+#include <QPainterPath>
 QAction * zLarge;
 QAction * zSmall ;
 QAction * pencil;
@@ -42,6 +43,8 @@ Segmentation::Segmentation(QWidget *parent) : QMainWindow(parent),ui( new Ui::Se
     ui->size->setValue(100);
     ui->saveImage->setEnabled(false);
     ui->saveAsImage->setEnabled(false);
+    ui->segmentation->setEnabled(false);
+    ui->editImage->setEnabled(false);
     color = QColor(0,0,0);
     QPixmap pen("C:\\Users\\aduongng\\Desktop\\project\\App\\Radium-Apps\\ShaderEditor\\pencil.png");
     QPixmap colorBlack("C:\\Users\\aduongng\\Desktop\\project\\App\\Radium-Apps\\ShaderEditor\\black.png");
@@ -67,6 +70,8 @@ Segmentation::Segmentation(QWidget *parent) : QMainWindow(parent),ui( new Ui::Se
     connect( ui->saveAsImage, &QAction::triggered, this, & Segmentation::saveAsImage);
     connect( ui->quitApp, &QAction::triggered, this, & Segmentation::quit);
     connect( ui->pushButton, &QPushButton::clicked, this, & Segmentation::showImage );
+    connect( ui->paint, &QAction::triggered, this, & Segmentation::choosePaint );
+    connect( ui->segmentation_2D, &QAction::triggered, this, & Segmentation::chooseSegemtation );
     connect(ui->size, SIGNAL(valueChanged(int)), this, SLOT(zoom(int)));
     connect(zLarge, &QAction::triggered, this, & Segmentation::zoomLarge);
     connect(zSmall, &QAction::triggered, this, & Segmentation::zoomSmall);
@@ -283,7 +288,18 @@ void  Segmentation::draw( QPainter &paint)
 {
     for(int i=0;i<pt1.size();i++)
     {
-       paint.drawLine(pt1[i],pt2[i]);
-       pt1=pt2;
+       paint.drawPoint(pt1[i]);
+      // pt1=pt2;
     }
+}
+
+void Segmentation::choosePaint()
+{
+ ui->editImage->setEnabled(true);
+ ui->segmentation->setEnabled(false);
+}
+void Segmentation::chooseSegemtation()
+{
+ ui->segmentation->setEnabled(true);
+ ui->editImage->setEnabled(false);
 }
