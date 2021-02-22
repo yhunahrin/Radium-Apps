@@ -10,6 +10,7 @@
 #include <QPainter>
 #include <QLine>
 #include <QMouseEvent>
+#include <QPainterPath>
 namespace Ui {
 class Segmentation;
 }
@@ -51,6 +52,8 @@ private slots:
     void zoomLarge();
     void zoomSmall();
     void drawPen();
+    void choosePaint();
+    void chooseSegemtation();
 private:
     Ui::Segmentation *ui;
     QString path;
@@ -60,6 +63,7 @@ private:
     bool drawing=false;
     QVector<QPoint> pt1;                         // point array
     QVector<QPoint> pt2;
+    QPainterPath *p;
 
 };
 #endif // SEGEMENTATION_H
