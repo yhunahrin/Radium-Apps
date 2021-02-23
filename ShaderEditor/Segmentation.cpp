@@ -82,6 +82,7 @@ Segmentation::Segmentation(QWidget *parent) : QMainWindow(parent),ui( new Ui::Se
     connect(pencil, &QAction::triggered, this, & Segmentation::drawPen);
     connect(black, &QAction::triggered, this, & Segmentation::colorBlack);
     connect(white, &QAction::triggered, this, & Segmentation::colorWhite);
+    connect( ui->run, &QPushButton::clicked, this, & Segmentation::runSegmentation );
 
 }
 
@@ -286,16 +287,15 @@ void  Segmentation::mouseReleaseEvent(QMouseEvent *event)
 }
 void  Segmentation::paintEvent(QPaintEvent *)
 {
-
     if(drawing==true){
     QPen pen;
+    ui->listView->resize(image.width(),image.height());
+    ui->label_2->resize(image.width(),image.height());
     QPainter tmpPainter(&image);
     pen.setColor(color);
     pen.setWidth(5);
     tmpPainter.setPen(pen);
     draw(tmpPainter);
-    ui->listView->resize(image.width(),image.height());
-    ui->label_2->resize(image.width(),image.height());
     ui->label_2->setPixmap(image);
     }
 }
@@ -317,4 +317,57 @@ void Segmentation::chooseSegemtation()
 {
  ui->segmentation->setEnabled(true);
  ui->editImage->setEnabled(false);
+}
+
+void Segmentation::runSegmentation()
+{
+    QMessageBox msgBox;
+    QDir pathDirImage(ui->image_path->toPlainText());
+    QDir pathDirMask(ui->mask_path->toPlainText());
+    QFile pathDirModel(ui->model->toPlainText());
+    QDir pathDirTest(ui->test_image->toPlainText());
+    if(ui->image_path->toPlainText().isEmpty()){
+         msgBox.setText("Can you add path of images tranining please?");
+         msgBox.exec();
+    }
+    else if(ui->mask_path->toPlainText().isEmpty()){
+        msgBox.setText("Can you add path of masks tranining please?");
+        msgBox.exec();
+    }
+    else if(ui->model->toPlainText().isEmpty()){
+        msgBox.setText("Can you add path of model check point please?");
+        msgBox.exec();
+    }
+    else if(ui->test_image->toPlainText().isEmpty()){
+        msgBox.setText("Can you add path of image test please?");
+        msgBox.exec();
+    }
+    else if(ui->output->toPlainText().isEmpty()){
+        msgBox.setText("Can you add path of image segementation please?");\
+        msgBox.exec();
+    }
+    else
+    {
+         if (!pathDirImage.exists()){
+             msgBox.setText("Path of image training is not exist!");
+             msgBox.exec();
+         }
+         else if (!pathDirMask.exists()){
+             msgBox.setText("Path of masks tranining is not exist!");
+             msgBox.exec();
+         }
+         else if (!pathDirModel.exists()){
+             msgBox.setText("Path of  model check point is not exist!");
+             msgBox.exec();
+         }
+         else if (!pathDirTest.exists()){
+             msgBox.setText("Path of image test is not exist!");
+             msgBox.exec();
+         }
+         else {
+             msgBox.setText("Ahihi");
+             msgBox.exec();
+         }
+
+    }
 }
