@@ -54,6 +54,7 @@ private slots:
     void drawPen();
     void choosePaint();
     void chooseSegemtation();
+    void runSegmentation();
 private:
     Ui::Segmentation *ui;
     QString path;
