@@ -31,6 +31,8 @@
 #include <QToolBar>
 #include <QSlider>
 #include <QPainterPath>
+#include <iostream>
+#include <fstream>
 QAction * zLarge;
 QAction * zSmall ;
 QAction * pencil;
@@ -47,7 +49,7 @@ Segmentation::Segmentation(QWidget *parent) : QMainWindow(parent),ui( new Ui::Se
     ui->saveAsImage->setEnabled(false);
     ui->segmentation->setEnabled(false);
     ui->editImage->setEnabled(false);
-    color = QColor(0,0,0);
+    color=Qt::black;
     QPixmap pen("C:\\Users\\aduongng\\Desktop\\project\\App\\Radium-Apps\\ShaderEditor\\pencil.png");
     QPixmap colorBlack("C:\\Users\\aduongng\\Desktop\\project\\App\\Radium-Apps\\ShaderEditor\\black.png");
     QPixmap colorWhite("C:\\Users\\aduongng\\Desktop\\project\\App\\Radium-Apps\\ShaderEditor\\white.png");
@@ -172,11 +174,11 @@ void Segmentation::quit()
 
 void Segmentation::colorBlack()
 {
-   color = QColor(0,0,0);
+     color = Qt::black;
 }
 void Segmentation::colorWhite()
 {
-    color = QColor(255,255,255);
+     color = Qt::white;
 }
 void Segmentation::zoom(int k)
 {
@@ -261,18 +263,18 @@ void  Segmentation::mousePressEvent(QMouseEvent *event)
 {
     if ((event->button() == Qt::LeftButton)&&(drawing ==true))
         {
-            pt1.push_back(event -> pos());
-            pt2 =pt1;
+            pt1=event -> pos();
+           // pt2 =pt1;
         }
 }
 void  Segmentation::mouseMoveEvent(QMouseEvent *event)
 {
-    if ((event->buttons() == QEvent::MouseMove)&&(drawing ==true))
+   /* if ((event->buttons() == QEvent::MouseMove)&&(drawing ==true))
         {
              pt2.pop_back();
              pt2.push_back(event->pos());
              update ();
-        }
+        }*/
 }
 void  Segmentation::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -289,23 +291,27 @@ void  Segmentation::paintEvent(QPaintEvent *)
 {
     if(drawing==true){
     QPen pen;
-    ui->listView->resize(image.width(),image.height());
-    ui->label_2->resize(image.width(),image.height());
+    //ui->listView->resize(image.width(),image.height());
+    //ui->label_2->resize(image.width(),image.height());
+   // image = QPixmap::fromImage(ui->label_2->pixmap()->toImage());
     QPainter tmpPainter(&image);
     pen.setColor(color);
     pen.setWidth(5);
     tmpPainter.setPen(pen);
-    draw(tmpPainter);
+    tmpPainter.drawPoint(pt1);
     ui->label_2->setPixmap(image);
+      // pt1=pt2;
     }
+
+
 }
 void  Segmentation::draw( QPainter &paint)
-{
+{/*
     for(int i=0;i<pt1.size();i++)
     {
        paint.drawPoint(pt1[i]);
       // pt1=pt2;
-    }
+    }*/
 }
 
 void Segmentation::choosePaint()
@@ -324,8 +330,9 @@ void Segmentation::runSegmentation()
     QMessageBox msgBox;
     QDir pathDirImage(ui->image_path->toPlainText());
     QDir pathDirMask(ui->mask_path->toPlainText());
-    QFile pathDirModel(ui->model->toPlainText());
-    QDir pathDirTest(ui->test_image->toPlainText());
+    QFileInfo pathDirModel(ui->model->toPlainText());
+    QFileInfo pathDirTest(ui->test_image->toPlainText());
+    QFileInfo pathDirOut(ui->output->toPlainText());
     if(ui->image_path->toPlainText().isEmpty()){
          msgBox.setText("Can you add path of images tranining please?");
          msgBox.exec();
@@ -365,7 +372,104 @@ void Segmentation::runSegmentation()
              msgBox.exec();
          }
          else {
-             msgBox.setText("Ahihi");
+             std::ofstream model ("modelUnet.py");
+             model<<"from keras.models import load_model\n";
+             model<<"from keras import models\n";
+             model<<"import numpy as np\n";
+             model<<"import glob2\n";
+             model<<"import glob\n";
+             model<<"import tensorflow as tf\n";
+             model<<"import cv2\n";
+             model<<"from tensorflow.keras.optimizers import Adam\n";
+             model<<"from tensorflow.keras.callbacks import EarlyStopping\n";
+             model<<"from sklearn.model_selection import train_test_split\n";
+             model<<"import matplotlib.pyplot as plt\n";
+             model<<"from keras.callbacks import ModelCheckpoint\n";
+             model<<"from keras.models import *\n";
+             model<<"from keras.layers import *\n";
+             model<<"from keras.optimizers import *\n";
+             model<<"from keras.callbacks import ModelCheckpoint, LearningRateScheduler\n";
+             model<<"from keras import backend as keras\n";
+             model<<"from keras.utils import to_categorical\n";
+             model<<"import skimage.io as io\n";
+             model<<"INPUT_SHAPE = 512\n";
+             model<<"OUTPUT_SHAPE = 512 \n";
+             model<<"image_paths = glob2.glob('";
+             model<<pathDirImage.path().toStdString();
+             model<<"/*')\n";
+             model<<"label_paths = glob2.glob('";
+             model<<pathDirMask.path().toStdString();
+             model<<"/*')\n";
+             model<<"train_img_paths, val_img_paths, train_label_paths, val_label_paths = train_test_split(image_paths, label_paths, test_size = 0.2)\n";
+             model<<"def _image_read_paths(train_img_paths, train_label_paths):\n";
+             model<<"\tX, Y = [], []\n";
+             model<<"\tfor image_path, label_path in zip(train_img_paths, train_label_paths):\n";
+             model<<"\t\timage = cv2.imread(image_path)\n";
+             model<<"\t\timage_resize = cv2.resize(image, (INPUT_SHAPE, INPUT_SHAPE), cv2.INTER_LINEAR)\n";
+             model<<"\t\tlabel = cv2.imread(label_path)\n";
+             model<<"\t\tlabel_gray = cv2.cvtColor(label, cv2.COLOR_BGR2GRAY)\n";
+             model<<"\t\tlabel_resize = cv2.resize(label_gray, (OUTPUT_SHAPE, OUTPUT_SHAPE), cv2.INTER_LINEAR)\n";
+             model<<"\t\tlabel_binary = np.array(label_resize == 255).astype('float32')\n";
+             model<<"\t\tlabel_binary = label_binary[..., np.newaxis]\n";
+             model<<"\t\tX.append(image_resize)\n";
+             model<<"\t\tY.append(label_binary)\n";
+             model<<"\tX = np.stack(X)\n";
+             model<<"\tY = np.stack(Y)\n";
+             model<<"\treturn X, Y\n";
+             model<<"X_train, Y_train = _image_read_paths(train_img_paths, train_label_paths)\n";
+             model<<"X_val, Y_val = _image_read_paths(val_img_paths, val_label_paths)\n";
+             model<<"def _downsample_cnn_block(block_input, channel):\n";
+             model<<"\tmaxpool = MaxPooling2D(pool_size=(2,2))(block_input)\n";
+             model<<"\tconv1 = Conv2D(filters=channel, kernel_size=3, strides=1, padding='same')(maxpool)\n";
+             model<<"\tconv2 = Conv2D(filters=channel, kernel_size=3, strides=1, padding='same')(conv1)\n";
+             model<<"\treturn [maxpool, conv1, conv2]\n";
+             model<<"def _upsample_cnn_block(block_input, block_counterpart, channel):\n";
+             model<<"\tup = Conv2D(filters=channel, kernel_size=2, strides=1, padding='same')(UpSampling2D(size=(2,2))(block_input))\n";
+             model<<"\tconcat = Concatenate(axis=-1)([block_counterpart, up])\n";
+             model<<"\tconv1 = Conv2D(filters=channel, kernel_size=3, strides=1, padding='same')(concat)\n";
+             model<<"\tconv2 = Conv2D(filters=channel, kernel_size=3, strides=1, padding='same')(conv1)\n";
+             model<<"\treturn [up, concat, conv1, conv2]\n";
+             model<<"def unet():\n";
+             model<<"\tinput = Input(shape=(INPUT_SHAPE, INPUT_SHAPE, 3))\n";
+             model<<"\tconv1_ds_block1 = Conv2D(filters=64,kernel_size=3, strides=1, padding='same')(input)\n";
+             model<<"\tconv2_ds_block1 = Conv2D(filters=64,kernel_size=3, strides=1, padding='same')(conv1_ds_block1)\n";
+             model<<"\tds_block2 = _downsample_cnn_block(conv2_ds_block1, channel=128)\n";
+             model<<"\tds_block3 = _downsample_cnn_block(ds_block2[-1], channel=256)\n";
+             model<<"\tds_block4 = _downsample_cnn_block(ds_block3[-1], channel=512)\n";
+             model<<"\tdrop_ds_block4 = Dropout(0.5)(ds_block4[-1])\n";
+             model<<"\tds_block5 = _downsample_cnn_block(drop_ds_block4, channel=1024)\n";
+             model<<"\tdrop_ds_block5 = Dropout(0.5)(ds_block5[-1])\n";
+             model<<"\tus_block4 = _upsample_cnn_block(drop_ds_block5, drop_ds_block4, channel=512)\n";
+             model<<"\tus_block3 = _upsample_cnn_block(us_block4[-1], ds_block3[-1], channel=256)\n";
+             model<<"\tus_block2 = _upsample_cnn_block(us_block3[-1], ds_block2[-1], channel=128)\n";
+             model<<"\tus_block1 = _upsample_cnn_block(us_block2[-1], conv2_ds_block1, channel=64)\n";
+             model<<"\tconv3_us_block1 = Conv2D(filters=2,kernel_size=3, strides=1, padding='same')(us_block1[-1])\n";
+             model<<"\tconv4_us_block1 = Conv2D(filters=1, kernel_size=1, strides=1, padding='same', activation='sigmoid')(conv3_us_block1)\n";
+             model<<"\tmodel = tf.keras.models.Model(inputs = input , outputs = conv4_us_block1)\n";
+             model<<"\tmodel.compile(optimizer=Adam(lr = 1e-4), loss='binary_crossentropy', metrics='accuracy')\n";
+             model<<"\treturn model\n";
+             model<<"model2 = unet()\n";
+             model<<"model_checkpoint = ModelCheckpoint('";
+             model<<pathDirModel.absoluteFilePath().toStdString();
+             model<<"',monitor = 'loss', verbose=1,save_best_only = True)\n";
+             model<<"model2.fit(X_train, Y_train,validation_data = (X_val, Y_val),batch_size = 8, epochs = 1 ,callbacks = [model_checkpoint])\n";
+             model<<"def _predict_path(path,path_out, figsize = (16, 8)):\n";
+             model<<"\timg_tmp = cv2.imread(path)\n";
+             model<<"\th, w, _ = img_tmp.shape\n";
+             model<<"\timg = cv2.resize(img_tmp, (512, 512), cv2.INTER_LINEAR)\n";
+             model<<"\timg_expand = img[np.newaxis, ...]\n";
+             model<<"\timg_pred = model2.predict(img_expand).reshape(512, 512)\n";
+             model<<"\timg_pred[img_pred < 0.5] = 0\n";
+             model<<"\timg_pred[img_pred >= 0.5] = 1\n";
+             model<<"\timg_pred = cv2.resize(img_pred,(w,h))\n";
+             model<<"\tio.imsave(path_out,img_pred)\n";
+             model<<"_predict_path('";
+             model<<pathDirTest.absoluteFilePath().toStdString();
+             model<<"','";
+             model<<pathDirOut.absoluteFilePath().toStdString();
+             model<<"')\n";
+             model.close();
+             msgBox.setText("Your File Model is Successly!!");
              msgBox.exec();
          }
 
