@@ -34,6 +34,8 @@
 QAction * zLarge;
 QAction * zSmall ;
 QAction * pencil;
+int w;
+int h;
 Segmentation::Segmentation(QWidget *parent) : QMainWindow(parent),ui( new Ui::Segmentation)
 
 {
@@ -65,6 +67,8 @@ Segmentation::Segmentation(QWidget *parent) : QMainWindow(parent),ui( new Ui::Se
     toolbarZoom->addSeparator();
     QAction *_toolbarZoom = toolbarZoom->toggleViewAction();
     ui->menuView->addAction(_toolbarZoom);
+    w = ui->listView->width();
+    h = ui->listView->height();
     connect( ui->openImageTest, &QAction::triggered, this, & Segmentation::loadImageTest);
     connect( ui->saveImage, &QAction::triggered, this, & Segmentation::saveImage);
     connect( ui->saveAsImage, &QAction::triggered, this, & Segmentation::saveAsImage);
@@ -140,8 +144,10 @@ void Segmentation::showImage()
     Ra::Engine::TextureParameters tmp1;
     path = ui->comboBox->currentText();
     image = QPixmap::fromImage(_image);
-    ui->listView->resize(image.width(),image.height());
-    ui->label_2->resize(image.width(),image.height());
+    w = image.width();
+    h = image.height();
+    ui->listView->resize(w,h);
+    ui->label_2->resize(w,h);
     ui->label_2->setPixmap(image);
     ui->saveImage->setEnabled(true);
     ui->saveAsImage->setEnabled(true);
@@ -173,69 +179,76 @@ void Segmentation::colorWhite()
 }
 void Segmentation::zoom(int k)
 {
-   float tmp_width = (ui->listView->width()*ui->label_3->text().toInt()/100);
+   drawing = false;
+  /* float tmp_width = (ui->listView->width()*ui->label_3->text().toInt()/100);
    float tmp_height = (ui->listView->height()*ui->label_3->text().toInt()/100);
    ui->label_3->setText(QString::number(k));
    float tmp1_width = (ui->listView->width()*k/100);
    float tmp1_height = ui->listView->height()*k/100;
    float width = ui->listView->width()+ (tmp1_width- tmp_width);
-   float height = ui->listView->height()+ (tmp1_height- tmp_height);
+   float height = ui->listView->height()+ (tmp1_height- tmp_height);*/
+   int width = w*k/100;
+   int height = h*k/100;
    ui->listView->resize(width,height);
    ui->label_2->resize(width,height);
+   ui->label_3->setText(QString::number(k));
    if(haveImage){
-       QImageReader reader;
-       reader.setFileName(path);
-       QImage _image = reader.read();
+       //QImageReader reader;
+       //reader.setFileName(path);
+      // QImage _image = reader.read();
+       QImage _image = image.toImage();
        QImage img2 = _image.scaled(width, height, Qt::IgnoreAspectRatio);
        ui->label_2->setPixmap(QPixmap::fromImage(img2));
-       ui->listView->resize(img2.width(),img2.height());
-
-
    }
+   if(k==300)
+      zLarge->setEnabled(false);
 
 }
 void Segmentation::zoomLarge()
 {
+    drawing = false;
     zSmall->setEnabled(true);
     if(ui->label_3->text().toInt()<=590){
         float k = ui->label_3->text().toInt() +10;
         ui->label_3->setText(QString::number(k));
-        float width = ui->listView->width()*1.1;
-        float height = ui->listView->height()*1.1;
+        int width = w*k/100;
+        int height = h*k/100;
         ui->listView->resize(width,height);
         ui->label_2->resize(width,height);
         ui->size->setValue(k);
         if(haveImage){
-            QImageReader reader;
-            reader.setFileName(path);
-            QImage _image = reader.read();
+           // QImageReader reader;
+            //reader.setFileName(path);
+            //QImage _image = reader.read();
+            QImage _image = image.toImage();
             QImage img2 = _image.scaled(width, height, Qt::IgnoreAspectRatio);
             ui->label_2->setPixmap(QPixmap::fromImage(img2));
-            ui->listView->resize(img2.width(),img2.height());
 
         }
-        if(k==600)
+        if(k==300)
            zLarge->setEnabled(false);
+        if(k==50)
+           zSmall->setEnabled(false);
     }
 }
 void Segmentation::zoomSmall()
 {
+    drawing = false;
     zLarge->setEnabled(true);
     if(ui->label_3->text().toInt()>=60){
         float k = ui->label_3->text().toInt() -10;
         ui->label_3->setText(QString::number(k));
-        float width = ui->listView->width()*0.9;
-        float height = ui->listView->height()*0.9;
+        int width = w*k/100;
+        int height = h*k/100;
         ui->listView->resize(width,height);
         ui->label_2->resize(width,height);
         ui->size->setValue(k);
         if(haveImage){
-            QImageReader reader;
-            reader.setFileName(path);
-            QImage _image = reader.read();
+           // QImageReader reader;
+            //reader.setFileName(path);
+            QImage _image = image.toImage();
             QImage img2 = _image.scaled(width, height, Qt::IgnoreAspectRatio);
             ui->label_2->setPixmap(QPixmap::fromImage(img2));
-            ui->listView->resize(img2.width(),img2.height());
 
         }
         if(k==50)
@@ -281,6 +294,8 @@ void  Segmentation::paintEvent(QPaintEvent *)
     pen.setWidth(5);
     tmpPainter.setPen(pen);
     draw(tmpPainter);
+    ui->listView->resize(image.width(),image.height());
+    ui->label_2->resize(image.width(),image.height());
     ui->label_2->setPixmap(image);
     }
 }
