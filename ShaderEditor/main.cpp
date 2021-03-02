@@ -3,12 +3,13 @@
 #include <GuiBase/RadiumWindow/SimpleWindowFactory.hpp>
 
 // include the Engine/entity/component interface
+// include the Engine/entity/component interface
+#include <Core/Geometry/MeshPrimitives.hpp>
 #include <Core/Geometry/MeshPrimitives.hpp>
 #include <Engine/Component/GeometryComponent.hpp>
 #include <Engine/Managers/EntityManager/EntityManager.hpp>
 #include <Engine/Renderer/RenderObject/RenderObjectManager.hpp>
 #include <Engine/System/GeometrySystem.hpp>
-
 // include the custom material definition
 #include <Engine/Renderer/Material/RawShaderMaterial.hpp>
 
@@ -20,6 +21,7 @@
 #include "MyParameterProvider.hpp"
 #include "MeshPaintUI.h"
 #include "Segmentation.h"
+
 #include <string>
 
 // Qt
@@ -59,11 +61,11 @@ const std::string _fragmentShaderSource {
     "}\n"};
 
 
-
 const ShaderConfigType defaultConfig {
     {Ra::Engine::ShaderType::ShaderType_VERTEX, _vertexShaderSource},
     {Ra::Engine::ShaderType::ShaderType_FRAGMENT, _fragmentShaderSource}};
-std::string path = "C:/Users/aduongng/Desktop/project/ex.bmp";
+
+std::string path = "C:\\Users\\aduongng\\Desktop\\dataset\\mask\\mask80.bmp";
 auto paramProvider = std::make_shared<MyParameterProvider>();
 /**
  * Generate a quad with a ShaderMaterial attached
@@ -72,36 +74,60 @@ auto paramProvider = std::make_shared<MyParameterProvider>();
  *
  */
 std::shared_ptr<Ra::Engine::RenderObject> initQuad( Ra::GuiBase::BaseApplication& app ) {
-    //! [Creating the quad]
-    auto quad = Ra::Core::Geometry::makeZNormalQuad( {1_ra, 1_ra} );
 
-    //! [Create the engine entity for the quad]
-    auto e = app.m_engine->getEntityManager()->createEntity( "Quad Entity" );
+        //! [Creating the quad]
+        auto quad = Ra::Core::Geometry::makeZNormalQuad( {1_ra, 1_ra} );
+    //NEW CONTENT STARTS HERE
+        //Adding texture coordinates to the geometry
 
-    //! [Create Parameter provider for the shader]
-    paramProvider->setOrComputeTheParameterValues(path);
-    //! [Create the shader material]
-    //!
+    //NEW CONTENT ENDS HERE
+        //! [Create the engine entity for the quad]
+        auto e = app.m_engine->getEntityManager()->createEntity( "Quad Entity" );
 
-    Ra::Core::Asset::RawShaderMaterialData mat {"Quad Material", defaultConfig, paramProvider};
+        //! [Create Parameter provider for the shader]
+        paramProvider->setOrComputeTheParameterValues(path);
+        Ra::Core::Vector2Array texcoords{{0_ra,0_ra},{1_ra,0_ra},{0_ra,1_ra},{1_ra,1_ra}};
+       // Ra::Core::Vector2Array texcoords{{1_ra,0_ra},{1_ra,1_ra},{0_ra,0_ra},{1_ra,0_ra},{1_ra,1_ra},{0_ra,0_ra}};
+      //  Ra::Core::Vector2Array texcoords{{0_ra,1_ra},{1_ra,1_ra},{0_ra,0_ra},{1_ra,0_ra},{1_ra,0_ra},{0_ra,1_ra}};
+        quad.addAttrib("texCoordIn",texcoords);
 
-    //! [Create a geometry component using the custom material]
-    auto c = new Ra::Engine::TriangleMeshComponent( "Quad Mesh", e, std::move( quad ), &mat );
+        //! [Create the shader material]
+        Ra::Core::Asset::RawShaderMaterialData mat {"Quad Material", defaultConfig, paramProvider};
 
-    //! [Register the entity/component association to the geometry system ]
-    auto system = app.m_engine->getSystem( "GeometrySystem" );
-    system->addComponent( e, c );
-    //![get the renderobject for further edition]
-    auto ro = Ra::Engine::RadiumEngine::getInstance()->getRenderObjectManager()->getRenderObject(
-        c->m_renderObjects[0] );
+        //! [Create a geometry component using the custom material]
+        auto c = new Ra::Engine::TriangleMeshComponent( "Quad Mesh", e, std::move( quad ), &mat);
+        //! [Register the entity/component association to the geometry system ]
+        auto system = app.m_engine->getSystem( "GeometrySystem" );
+        system->addComponent( e, c );
 
-    // Initialize all OpenGL state for the scene content
-    app.m_mainWindow->postLoadFile( "Cube" );
-    return ro;
+        //![get the renderobject for further edition]
+        auto ro = Ra::Engine::RadiumEngine::getInstance()->getRenderObjectManager()->getRenderObject(
+            c->m_renderObjects[0] );
+
+        // Initialize all OpenGL state for the scene content
+        app.m_mainWindow->postLoadFile( "Cube" );
+        return ro;
 }
 
-int main( int argc, char* argv[] ) {
-    /*Ra::GuiBase::BaseApplication app( argc, argv, Ra::GuiBase::SimpleWindowFactory{} );
+
+
+
+/*class MainWindowFactory : public Ra::GuiBase::BaseApplication::WindowFactory
+{
+  public:
+    using Ra::GuiBase::BaseApplication::WindowFactory::WindowFactory;
+    Ra::GuiBase::MainWindowInterface* createMainWindow() const override {
+        return new Ra::Segmentation();
+    }
+};
+
+int main( int argc, char** argv ) {
+   Ra::GuiBase::BaseApplication app( argc, argv, MainWindowFactory() );
+   app.setContinuousUpdate( false );
+    return app.exec();
+}*/
+ int main( int argc, char* argv[] ) {
+    Ra::GuiBase::BaseApplication app( argc, argv, Ra::GuiBase::SimpleWindowFactory{} );
     //! [add the custom material to the material system]
     Ra::Engine::RawShaderMaterial::registerMaterial();
 
@@ -111,7 +137,7 @@ int main( int argc, char* argv[] ) {
         new CameraManipulator2D( *( viewer->getCameraManipulator() ) ) );
     QDockWidget* dock = new QDockWidget("Shaders editor");
     dock->setWidget( new ShaderEditorWidget(defaultConfig[0].second, defaultConfig[1].second, ro, viewer->getRenderer(),path, paramProvider, dock) );
-    app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);*/
+    app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
   //  Ra::GuiBase::BaseApplication app( argc, argv,Ra::GuiBase::SimpleWindowFactory{} );
     /*auto viewer = app.m_mainWindow->getViewer();
     viewer->setCameraManipulator(
@@ -121,15 +147,21 @@ int main( int argc, char* argv[] ) {
     //QMainWindow* a = new QMainWindow(app)
    // dock->setWidget(new Segmentation(dock) );
     //app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
-      QApplication app(argc, argv);
+    /* QApplication app(argc, argv);
 
       Segmentation window;
 
       window.setGeometry(300, 300,800, 600);
+      window.setWindowIcon(QIcon("C:/Users/aduongng/Desktop/project/App/Radium-Apps/ShaderEditor/image131.bmp"));
       window.setWindowTitle("Segmentation");
       window.show();
+*/
 
 
-
+    /*Ra::GuiBase::BaseApplication app( argc, argv, Ra::GuiBase::SimpleWindowFactory{} );
+    app.setContinuousUpdate( false );
+    QDockWidget* dock = new QDockWidget("Segmentation");*/
+    // dock->setWidget(new Segmentation(dock) );
+     //app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
     return app.exec();
 }
