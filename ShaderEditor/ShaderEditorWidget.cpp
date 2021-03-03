@@ -95,10 +95,6 @@ void ShaderEditorWidget::loadData()
 
 void ShaderEditorWidget::showImage()
 {
-    QImageReader reader;
-    reader.setFileName(ui->_listPath->currentText());
-    QImage image = reader.read();
-    Ra::Engine::TextureParameters tmp1;
     _path = ui->_listPath->currentText().toStdString();
     _paramProvider->setPath(_path);
 }
