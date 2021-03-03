@@ -32,7 +32,7 @@ ShaderEditorWidget::ShaderEditorWidget(
                                 std::shared_ptr< Ra::Engine::RenderObject > ro,
                                 Ra::Engine::Renderer * renderer,
                                 std::string path,
-                                std::shared_ptr< Ra::Engine::ShaderParameterProvider > paramProvider,
+                                std::shared_ptr< MyParameterProvider > paramProvider,
                                 QWidget *parent) :
     QWidget( parent ),
     ui( new Ui::ShaderEditorWidget ),
@@ -100,7 +100,5 @@ void ShaderEditorWidget::showImage()
     QImage image = reader.read();
     Ra::Engine::TextureParameters tmp1;
     _path = ui->_listPath->currentText().toStdString();
-    std::cout<<_path<<std::endl;
-    this->updateShadersFromUI();
+    _paramProvider->setPath(_path);
 }
-
