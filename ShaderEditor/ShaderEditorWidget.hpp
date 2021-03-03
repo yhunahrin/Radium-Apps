@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QString>
 #include <Engine/Renderer/Texture/TextureManager.hpp>
+#include "MyParameterProvider.hpp"
 namespace Ui {
 class ShaderEditorWidget;
 }
@@ -12,6 +13,7 @@ namespace Engine{
     class RenderObject;
     class Renderer;
     class ShaderParameterProvider;
+    class TextureManager;
 }
 }
 
@@ -27,7 +29,7 @@ public:
                                 std::shared_ptr< Ra::Engine::RenderObject > ro,
                                 Ra::Engine::Renderer * renderer,
                                 std::string path,
-                                std::shared_ptr< Ra::Engine::ShaderParameterProvider > paramProvider,
+                                std::shared_ptr< MyParameterProvider > paramProvider,
                                 QWidget *parent = nullptr);
     ~ShaderEditorWidget();
 
@@ -41,6 +43,6 @@ private:
     std::shared_ptr< Ra::Engine::RenderObject > _ro;
     Ra::Engine::Renderer * _renderer;
     std::string _path;
-    std::shared_ptr< Ra::Engine::ShaderParameterProvider > _paramProvider;
+    std::shared_ptr< MyParameterProvider  > _paramProvider;
 };
 
