@@ -53,7 +53,7 @@ set(app_uis
 
 qt5_wrap_ui(app_uis_moc ${app_uis})
 
-set(app_resources
+/*set(app_resources
    )
 
 set(MODULE_SOURCE "${PROJECT_SOURCE_DIR}/module")
@@ -68,7 +68,7 @@ pybind11_add_module(
         pybind11module
         ${MODULE_SOURCE}//module.cpp
 )
-
+*/
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(
@@ -83,7 +83,7 @@ add_executable(
     ${app_uis_moc}
     ${app_resources}
     )
-add_executable(
+/*add_executable(
         pybind11app
         ${APP_SOURCE}//app.cpp
 )
@@ -91,20 +91,20 @@ target_include_directories(
     pybind11app
     PRIVATE ${APP_SOURCE}
     PRIVATE ${MODULE_SOURCE}
-)
+)*/
 target_link_libraries (${PROJECT_NAME} PUBLIC
     Radium::Core
     Radium::Engine
     Radium::GuiBase
     Radium::IO
     ${Qt5_LIBRARIES}
-    PRIVATE pybind11::embed
-    pybind11::module
-    pybind11::pybind11)
-target_link_libraries(
+    //PRIVATE pybind11::embed
+    //pybind11::module
+    //pybind11::pybind11)
+/*target_link_libraries(
         pybind11app
         PRIVATE pybind11::embed
-)
+)*/
 configure_radium_app(
     NAME ${PROJECT_NAME}
     USE_PLUGINS
