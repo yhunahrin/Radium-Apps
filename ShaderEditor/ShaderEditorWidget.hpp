@@ -1,8 +1,8 @@
 #pragma once
 
 #include <QWidget>
+#include <QMainWindow>
 #include <QString>
-#include <Engine/Renderer/Texture/TextureManager.hpp>
 #include "MyParameterProvider.hpp"
 namespace Ui {
 class ShaderEditorWidget;
