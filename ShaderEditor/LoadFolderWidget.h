@@ -4,11 +4,13 @@
 #include <QWidget>
 #include <QMainWindow>
 #include <QString>
+#include <QFileDialog>
 #include "MyParameterProvider.hpp"
 #include "ui_LoadFolderWidget.h"
 #define LOADDATA 1
 #define SHOWIMAGE 2
 #define SAVEJSON 3
+enum CNN { Unet, CNN2, CNN3 };
 namespace Ui {
 class LoadFolderWidget;
 }
@@ -42,6 +44,9 @@ private slots:
     void enableLoadData();
     void enableShowImage();
     void enableSaveJson();
+    void checkUnet();
+    void checkCNN2();
+    void checkCNN3();
     void runImage();
     void runUnet();
 
@@ -53,8 +58,11 @@ private:
     std::string _pathUnet;
     std::shared_ptr< MyParameterProvider  > _paramProvider;
     int choisTypeRun =0;
+    CNN typeCNN;
     QStringList pathListRawFull;
     QStringList pathListUnetFull;
+    QDir directoryRaw;
+    QDir directoryCNN;
 };
 
 
