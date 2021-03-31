@@ -32,6 +32,7 @@ LoadFolderWidget::LoadFolderWidget( std::shared_ptr< Ra::Engine::RenderObject > 
                                                             std::string pathRaw,
                                                             std::string pathUnet,
                                                             std::shared_ptr< MyParameterProvider > paramProvider,
+                                                            Ra::Gui::Viewer *viewer,
                                                             QWidget *parent) :
                                 QWidget( parent ),
                                 ui( new Ui::LoadFolderWidget),
@@ -39,16 +40,23 @@ LoadFolderWidget::LoadFolderWidget( std::shared_ptr< Ra::Engine::RenderObject > 
                                 _renderer( renderer ),
                                 _pathRaw(pathRaw),
                                 _pathUnet(pathUnet),
-                                _paramProvider(paramProvider)
+                                _paramProvider(paramProvider),
+                                _viewer(viewer)
 {
     ui->setupUi(this);
     ui->imageOrgine->setEnabled(false);
     ui->loadUnet->setEnabled(false);
     ui->textMethodeJson->setEnabled(false);
     ui->buttonRunUnet->setEnabled(false);
+   // _camera = new CameraManipulator2D(*(_viewer->getCameraManipulator()),_ro);
+    _camera = new CameraManipulator2D(*(_viewer->getCameraManipulator()));
+    _viewer->setCameraManipulator(_camera);
+    ui->groupCoordinate->setEnabled(false);
+    ui->inversePixel->setEnabled(false);
     connect( ui->buttonLoad, &QPushButton::clicked, this, &LoadFolderWidget::enableLoadData );
     connect( ui->buttonShow, &QPushButton::clicked, this, &LoadFolderWidget::enableShowImage);
     connect( ui->buttonJson, &QPushButton::clicked, this, &LoadFolderWidget::enableSaveJson);
+    connect( ui->inversePixel, &QPushButton::clicked, this, &LoadFolderWidget::enableInversePixel);
     connect( ui->checkUnet, &QPushButton::clicked, this, &LoadFolderWidget::checkUnet );
     connect( ui->checkCNN2, &QPushButton::clicked, this, &LoadFolderWidget::checkCNN2);
     connect( ui->checkCNN3,&QPushButton::clicked, this, &LoadFolderWidget::checkCNN3);
@@ -66,6 +74,8 @@ void LoadFolderWidget::enableLoadData()
     choisTypeRun = LOADDATA;
     ui->imageOrgine->setEnabled(true);
    // ui->loadUnet->setEnabled(true);
+    ui->buttonRunImage->setEnabled(true);
+    ui->groupCoordinate->setEnabled(false);
 }
 
 void LoadFolderWidget::enableShowImage()
@@ -73,6 +83,9 @@ void LoadFolderWidget::enableShowImage()
     choisTypeRun = SHOWIMAGE;
     ui->imageOrgine->setEnabled(true);
    // ui->loadUnet->setEnabled(true);
+     ui->buttonRunImage->setEnabled(true);
+     ui->groupCoordinate->setEnabled(false);
+     ui->inversePixel->setEnabled(false);
 }
 
 void LoadFolderWidget::enableSaveJson()
@@ -80,6 +93,15 @@ void LoadFolderWidget::enableSaveJson()
     choisTypeRun = SAVEJSON;
     ui->imageOrgine->setEnabled(true);
    // ui->loadUnet->setEnabled(true);
+     ui->buttonRunImage->setEnabled(true);
+     ui->groupCoordinate->setEnabled(false);
+     ui->inversePixel->setEnabled(false);
+}
+void LoadFolderWidget::enableInversePixel()
+{
+    choisTypeRun = INVERSEPIXEL;
+    ui->groupCoordinate->setEnabled(true);
+    ui->buttonRunImage->setEnabled(false);
 }
 void LoadFolderWidget::runImage()
 {
@@ -105,6 +127,32 @@ void LoadFolderWidget::runImage()
             textDataset+=std::to_string(nameList.size());
             textDataset+=" files\",\n";
             textDataset+="       \"images\" : [\n";
+           /* int count=1;
+            int size = nameList.size();
+            while(size>=10)
+            {
+                size/=10;
+                count++;
+            }
+            std::cout<<count<<std::endl;
+            for (int i=0; i<nameList.size();i++)
+            {
+                std::string tmp_name = "img";
+                int count2=1;
+                int tmp,tmp2;
+                tmp=i;
+                while(tmp>=10){
+                    count2++;
+                }
+                tmp2=count-count2;
+                for(int j=0;j<tmp2;j++){
+                    tmp_name+="0";
+                }
+                tmp_name+=std::to_string(i);
+                std::cout<<tmp_name<<std::endl;
+               // nameList[i]= QString::fromStdString(tmp_name);
+            }*/
+            pathListRawFull.clear();
             for (int i=0; i<nameList.size();i++){
                    pathListRawFull.append(directoryRaw.path()+"/"+nameList.at(i));
                    textDataset+="       {\n";
@@ -152,6 +200,12 @@ void LoadFolderWidget::runImage()
     }
         break;
     case SHOWIMAGE:{
+        if(ui->boxListImageOrigine->currentIndex()==-1){
+            QMessageBox msgBox2;
+            msgBox2.setText("Have no data of image Raw");
+            msgBox2.exec();
+        }
+        else{
         int tmp;
         tmp = ui->boxListImageOrigine->currentIndex();
         _pathRaw = pathListRawFull.at(tmp).toStdString();
@@ -159,7 +213,7 @@ void LoadFolderWidget::runImage()
         tmp = ui->boxImageUnet->findText(ui->boxListImageOrigine->currentText());
         if(tmp==-1){
             QMessageBox msgBox2;
-            msgBox2.setText("Have no data of image Unet");
+            msgBox2.setText("Have no data of CNN!!!");
             msgBox2.exec();
         }
         else {
@@ -168,9 +222,12 @@ void LoadFolderWidget::runImage()
             _pathUnet = pathListUnetFull.at(tmp).toStdString();
             _paramProvider->setPathRaw(_pathRaw);
             _paramProvider->setPathUnet(_pathUnet);
-            std::cout<<_pathRaw<<std::endl;
-            std::cout<<_pathUnet<<std::endl;
+            ui->boxImageUnet->setCurrentIndex(tmp);
+          //  std::cout<<_pathRaw<<std::endl;
+           // std::cout<<_pathUnet<<std::endl;
+            ui->inversePixel->setEnabled(true);
             }
+        }
         break;
     }
    case SAVEJSON:
@@ -226,7 +283,7 @@ void LoadFolderWidget::runUnet()
     QMessageBox msgBox;
     switch(choisTypeRun){
     case LOADDATA:{
-        msgBox.setText("Selection Folder Of Image after Segemation by Unet?");
+        msgBox.setText("Selection Folder Of Image after Segemation by CNN?");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::No);
         int res = msgBox.exec();
@@ -234,6 +291,7 @@ void LoadFolderWidget::runUnet()
             ui->boxImageUnet->clear();
             directoryCNN = QFileDialog::getExistingDirectory(this, "Select Directory");
             QStringList nameList = directoryCNN.entryList(QStringList() << "*.jpg" << "*.JPG" << "*.png" << "*.PNG" << "*.bmp" << "*.BMP",QDir::Files);
+            pathListUnetFull.clear();
             for (int i=0; i<nameList.size();i++){
                 pathListUnetFull.append(directoryCNN.path()+"/"+nameList.at(i));
             }
@@ -334,6 +392,12 @@ void LoadFolderWidget::runUnet()
     }
         break;
     case SHOWIMAGE:{
+        if(ui->boxImageUnet->currentIndex()==-1){
+            QMessageBox msgBox2;
+            msgBox2.setText("Have no data of image Unet");
+            msgBox2.exec();
+        }
+        else{
         int tmp;
         tmp = ui->boxImageUnet->currentIndex();
         _pathUnet = pathListUnetFull.at(tmp).toStdString();
@@ -348,12 +412,17 @@ void LoadFolderWidget::runUnet()
            // ui->boxListImageOrigine->setCurrentIndex(tmp);
             //_pathRaw = ui->boxListImageOrigine->currentText().toStdString();
             _pathRaw = pathListRawFull.at(tmp).toStdString();
+            ui->boxListImageOrigine->setCurrentIndex(tmp);
             _paramProvider->setPathRaw(_pathRaw);
             _paramProvider->setPathUnet(_pathUnet);
+           // std::cout<<_pathRaw<<std::endl;
+           // std::cout<<_pathUnet<<std::endl;
+            ui->inversePixel->setEnabled(true);
+        }
         }
         break;
     }
-    case SAVEJSON:
+    case SAVEJSON:{
         if(ui->textMethodeJson->document()->isEmpty()){
             QMessageBox msgBox3;
             msgBox3.setText("Method.json is empty !!!");
@@ -374,8 +443,82 @@ void LoadFolderWidget::runUnet()
             }
 
         }
+    }
         break;
-         break;
+    case INVERSEPIXEL:{
+        QImageReader reader;
+        QSettings settings;
+        reader.setFileName(QString::fromStdString(_pathUnet));
+        QImage image = reader.read();
+        int x =ui->spinX->text().toInt();
+        int y =ui->spinY->text().toInt();
+      if(x<0||y<0||x>image.width()||y>image.height()){
+          QMessageBox msgBox5;
+          msgBox5.setText("Coordinate not exist");
+          msgBox5.exec();
+      }
+      else{
+          std::cout<<"hihi"<<qRed(image.pixel(x,y))<<" "<<qGreen(image.pixel(x,y))<<qBlue(image.pixel(x,y))<<std::endl;
+          if(qRed(image.pixel(x,y))==0&&qGreen(image.pixel(x,y))==0&&qBlue(image.pixel(x,y))==0){
+              image.setPixelColor(x,y,Qt::white);
+              QMessageBox msgBox6;
+              msgBox6.setText("Black->White");
+              msgBox6.exec();
+          }
+          else if(qRed(image.pixel(x,y))==255&&qGreen(image.pixel(x,y))==255&&qBlue(image.pixel(x,y))==255){
+              image.setPixelColor(x,y,Qt::black);
+              QMessageBox msgBox6;
+              msgBox6.setText("White->Black");
+              msgBox6.exec();
+          }
+          std::cout<<"hoho"<<qRed(image.pixel(x,y))<<" "<<qGreen(image.pixel(x,y))<<qBlue(image.pixel(x,y))<<std::endl;
+          image.save(QString::fromStdString(_pathUnet));
+          int tmp = ui->boxImageUnet->currentIndex();
+          pathListUnetFull[tmp]=QString::fromStdString(_pathUnet);
+          _paramProvider->setPathUnet(_pathUnet);
+          Ra::Engine::Renderer::PickingQuery tmp1;
+          Ra::Core::Vector2 coords{x,y};
+          tmp1.m_screenCoords = coords;
+          tmp1.m_purpose = Ra::Engine::Renderer::SELECTION;
+          tmp1.m_mode = Ra::Engine::Renderer::VERTEX;
+          _renderer->addPickingRequest(tmp1);
+
+          //auto tex = _renderer->get
+        //  _renderer->addPickingRequest(tmp1);
+       //   std::cout<<_renderer-><<std::endl;
+
+        //  _renderer->doPickingNow(coords,_ro->
+      }
+    }
+        break;
     }
 
+}
+
+
+/*void LoadFolderWidget::inverseColor(){
+        QImageReader reader;
+        QSettings settings;
+        reader.setFileName(QString::fromStdString(_pathUnet));
+        QImage image = reader.read();
+        int x =ui->spinX->text().toInt();
+        int y =ui->spinY->text().toInt();
+        if(qRed(image.pixel(x,y))==0&&qGreen(image.pixel(x,y))==0&&qBlue(image.pixel(x,y))==0){
+            image.setPixelColor(x,y,Qt::white);
+        }
+        else if(qRed(image.pixel(x,y))==255&&qGreen(image.pixel(x,y))==255&&qBlue(image.pixel(x,y))==255){
+            image.setPixelColor(x,y,Qt::black);
+        }
+        image.save(QString::fromStdString(_pathUnet));
+}
+*/
+void LoadFolderWidget::mousePressEvent(QMouseEvent *event){
+         //if(!_camera->handleMousePressEvent(event,Qt::LeftButton, Qt::ShiftModifier,1))
+         //   std::cout<<"click roi ne"<<std::endl;
+    if(event->button()==Qt::LeftButton){
+        x = x+0.1;
+        y = y+0.1;
+       _paramProvider->setMouse({x,y});
+       std::cout<<"hhhhhhhhhhhhhhh"<<x<<std::endl;
+    }
 }
