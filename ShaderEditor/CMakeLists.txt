@@ -32,6 +32,8 @@ set(app_sources
         MeshPaintUI.cpp
         Segmentation.cpp
         LoadFolderWidget.cpp
+        Content.cpp
+
     )
 
 set(app_headers
@@ -42,6 +44,7 @@ set(app_headers
     Segmentation.h
     MeshPaintPluginMacros.h
     LoadFolderWidget.h
+    Content.h
    )
 
 set(app_uis
@@ -50,6 +53,7 @@ set(app_uis
     Segmentation.ui
     LoadFolderWidget.ui
    )
+
 
 qt5_wrap_ui(app_uis_moc ${app_uis})
 
