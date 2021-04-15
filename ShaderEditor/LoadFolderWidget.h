@@ -1,31 +1,41 @@
 #ifndef LOADFOLDERIMAGE_H
 #define LOADFOLDERIMAGE_H
 #pragma once
+#include <Engine/Renderer/Renderer.hpp>
+#include <Engine/Renderer/RenderObject/RenderObjectManager.hpp>
+#include <Engine/Renderer/RenderObject/RenderObject.hpp>
+
+// include the custom material definition
+#include <Engine/Renderer/Material/RawShaderMaterial.hpp>
+
+#include <QPushButton>
+#include <QString>
+#include <QTextEdit>
+#include <QMenu>
+#include <QImageReader>
+
+#include <QColorDialog>
+#include <QComboBox>
+#include <QPushButton>
+#include <QSettings>
+#include <QToolButton>
+#include <iostream>
+
+#include <QImage>
+#include <QImageReader>
+#include <QMenu>
+#include <QToolBar>
+#include <QSlider>
+#include <fstream>
 #include <QWidget>
-#include <QMainWindow>
 #include <QString>
 #include <QFileDialog>
 #include "MyParameterProvider.hpp"
 #include "ui_LoadFolderWidget.h"
-#include "CameraManipulator.hpp"
-#include <Core/Geometry/RayCast.hpp>
-#include <GuiBase/Viewer/Viewer.hpp>
-#define LOADDATA 1
-#define SHOWIMAGE 2
-#define SAVEJSON 3
-#define INVERSEPIXEL 4
-enum CNN { Unet, CNN2, CNN3 };
+#include "Content.h"
+
 namespace Ui {
 class LoadFolderWidget;
-}
-
-namespace Ra{
-namespace Engine{
-    class RenderObject;
-    class Renderer;
-    class ShaderParameterProvider;
-    class TextureManager;
-}
 }
 
 ///
@@ -36,46 +46,30 @@ class LoadFolderWidget: public QWidget
     Q_OBJECT
 
 public:
-    explicit LoadFolderWidget( std::shared_ptr< Ra::Engine::RenderObject > ro,
-                               Ra::Engine::Renderer * renderer,
-                               std::string pathRaw,
-                               std::string pathUnet,
-                               std::shared_ptr< MyParameterProvider > paramProvider,
-                               Ra::Gui::Viewer *_viewer,
+    explicit LoadFolderWidget(Content content,
                                QWidget *parent = nullptr);
+    Content getContent();
+    void setContent(Content content);
+
     ~LoadFolderWidget();
-//protected:
- //   void inverseColor();
 private slots:
     void enableLoadData();
     void enableShowImage();
     void enableSaveJson();
-    void enableInversePixel();
     void checkUnet();
     void checkCNN2();
     void checkCNN3();
     void runImage();
     void runUnet();
-protected:
-    void mousePressEvent(QMouseEvent *event);
 private:
+    Content _content;
     Ui::LoadFolderWidget *ui;
-    std::shared_ptr< Ra::Engine::RenderObject > _ro;
-    Ra::Engine::Renderer * _renderer;
-    std::string _pathRaw;
-    std::string _pathUnet;
-    std::shared_ptr< MyParameterProvider  > _paramProvider;
-    int choisTypeRun =0;
+    int typeRun =0;
     CNN typeCNN;
     QStringList pathListRawFull;
     QStringList pathListUnetFull;
     QDir directoryRaw;
     QDir directoryCNN;
-    CameraManipulator2D * _camera;
-    Ra::Gui::Viewer *_viewer;
-    Ra::Core::Ray r;
-    Scalar x =-0.5;
-    Scalar y =-0.5;
 };
 
 
