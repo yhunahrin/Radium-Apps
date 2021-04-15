@@ -65,12 +65,10 @@ public:
 
     void setTextureMangerRaw(Ra::Engine::TextureManager textureManagerRaw){
         m_textureManagerRaw = textureManagerRaw;
-        m_textureRaw->bind();
     }
 
     void setTextureMangerUnet(Ra::Engine::TextureManager textureManagerUnet){
         m_textureManagerUnet = textureManagerUnet;
-        m_textureUnet->bind();
     }
 
     Ra::Engine::Texture* getTextureRaw(){
