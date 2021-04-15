@@ -30,10 +30,10 @@ set(app_sources
         main.cpp
         ShaderEditorWidget.cpp
         MeshPaintUI.cpp
-        Segmentation.cpp
         LoadFolderWidget.cpp
         Content.cpp
-
+        MainWindow.cpp
+        MainApplication.cpp
     )
 
 set(app_headers
@@ -41,21 +41,24 @@ set(app_headers
     ShaderEditorWidget.hpp
     MyParameterProvider.hpp
     MeshPaintUI.h
-    Segmentation.h
     MeshPaintPluginMacros.h
     LoadFolderWidget.h
     Content.h
+    MainWindow.h
+    MainApplication.hpp
    )
 
 set(app_uis
     ShaderEditorWidget.ui
     MeshPaintUI.ui
-    Segmentation.ui
     LoadFolderWidget.ui
+    MainWindow.ui
    )
 
-
 qt5_wrap_ui(app_uis_moc ${app_uis})
+
+set(app_resources
+   )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -71,14 +74,14 @@ add_executable(
     ${app_uis_moc}
     ${app_resources}
     )
-    
+
 target_link_libraries (${PROJECT_NAME} PUBLIC
     Radium::Core
     Radium::Engine
     Radium::GuiBase
     Radium::IO
-    ${Qt5_LIBRARIES})
-
+    ${Qt5_LIBRARIES}
+    )
 configure_radium_app(
     NAME ${PROJECT_NAME}
     USE_PLUGINS
