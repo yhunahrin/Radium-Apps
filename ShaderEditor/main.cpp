@@ -23,7 +23,7 @@
 #include "Segmentation.h"
 #include "LoadFolderWidget.h"
 #include "Content.h"
-
+#include "MainWindow.h"
 #include <string>
 
 // Qt
@@ -33,180 +33,19 @@
 #include <QImageReader>
 #include <QToolBar>
 #include <QVBoxLayout>
-/**
- * Demonstrate the usage of RawShaderMaterial functionalities
- */
-// Vertex shader source code
-const std::string _vertexShaderSource {"#include \"TransformStructs.glsl\"\n"
-                                       "layout (location = 0) in vec3 in_position;\n"
-                                       "layout (location = 0) out vec3 out_pos;\n"
-                                       "layout (location = 1) in vec2 texCoordIn;\n"
-                                       "layout (location = 1) out vec2 texCoordOut;\n"
-                                       "uniform Transform transform;\n"
-                                       "void main(void)\n"
-                                       "{\n"
-                                       "    mat4 mvp    = transform.proj * transform.view;\n"
-                                       "    out_pos     = in_position;\n"
-                                       "    gl_Position = mvp*vec4(out_pos, 1.0);\n"
-                                       "    texCoordOut = texCoordIn ;\n"
-                                       "}\n"};
-// Fragment shader source code
-const std::string _fragmentShaderSource {
-    "layout (location = 0) in  vec3 out_pos;\n"
-    "layout (location = 0) out vec4 out_color;\n"
-    "layout (location = 1) in vec2 texCoordOut;\n"
-    "uniform vec4 aColorUniform;\n"
-    "uniform float aMixUniform;\n"
-    "uniform sampler2D aRawTextureUniform;\n"
-    "uniform sampler2D aUnetTextureUniform;\n"
-    "uniform vec2 aMousePos;\n"
-    "ivec2 size;\n"
-    "void main(void)\n"
-    "{\n"
-    "    size = textureSize(aUnetTextureUniform,0);\n"
-    "    vec2 pixel_size = 1.0/size;\n"
-    "    float distance  = length( out_pos.xy - aMousePos);"
-    "    float mixK      = pow( distance / aMixUniform, 2.0 ); "
-    "    vec4 imageRaw = texture(aRawTextureUniform,  texCoordOut)\n;"
-    "    vec4 imageUnet = texture(aUnetTextureUniform,  texCoordOut)\n;"
-    "    vec4 whiteColor  = vec4(1.0,1.0,1.0,1.0);\n"
-    "    vec4 blackColor  = vec4(0.0,0.0,0.0,1.0);"
-    "    vec4 tmp = mix(whiteColor,imageUnet * 1.2, clamp( mixK, 0.0, 1.0 ));\n"
-    "    out_color = imageRaw + imageUnet + tmp;\n"
 
-    "}\n"};
-
-
-const ShaderConfigType defaultConfig {
-    {Ra::Engine::ShaderType::ShaderType_VERTEX, _vertexShaderSource},
-    {Ra::Engine::ShaderType::ShaderType_FRAGMENT, _fragmentShaderSource},};
-
-std::string pathRaw = "C:\\Users\\aduongng\\Desktop\\TP_VO\\20703106.jpg";
-std::string pathUnet = "C:\\Users\\aduongng\\Desktop\\TP_VO\\20703106.jpg";
-auto paramProvider = std::make_shared<MyParameterProvider>();
-Ra::Core::Matrix4 projetMatrix;
-Ra::Core::Matrix4 viewMatrix;
-//Ra::Gui::PickingManager* pickingManager;
-//Ra::Gui::PickingManager* pickingManager;
-/**
- * Generate a quad with a ShaderMaterial attached
- * @param app
- * @return The renderObject associated to the created component.
- *
- */
-std::shared_ptr<Ra::Engine::RenderObject> initQuad( Ra::GuiBase::BaseApplication& app) {
-
-        //! [Creating the quad]
-          auto quad = Ra::Core::Geometry::makeZNormalQuad({1_ra, 1_ra});
-        //Adding texture coordinates to the geometry
-         // Ra::Core::Vector2Array texcoords{{0_ra,1_ra},{0_ra,0_ra},{1_ra,1_ra},{1_ra,0_ra}};
-          Ra::Core::Vector2Array texcoords{{0_ra,0_ra},{1_ra,0_ra},{0_ra,1_ra},{1_ra,1_ra}};
-        //  Ra::Core::Vector2Array texcoords{{0_ra,1_ra},{.5_ra,.5_ra},{0_ra,1_ra},{1_ra,1_ra}};
-     //   Ra::Core::Vector2Array texcoords{{1_ra,0_ra},{1_ra,1_ra},{0_ra,0_ra},{1_ra,0_ra},{1_ra,1_ra},{0_ra,0_ra}};
-//        Ra::Core::Vector2Array texcoords{{0_ra,1_ra},{1_ra,1_ra},{0_ra,0_ra},{1_ra,0_ra},{1_ra,0_ra},{0_ra,1_ra}};
-        quad.addAttrib("texCoordIn",texcoords);
-        //auto tex= app.m_engine->getTextureManager();
-        //tex->updatePendingTextures();
-        //! [Create the engine entity for the quad]
-        auto e = app.m_engine->getEntityManager()->createEntity( "Quad Entity" );
-
-        //! [Create Parameter provider for the shader]
-        paramProvider->setPathRaw(pathRaw);
-        paramProvider->setPathUnet(pathUnet);
-      //  paramProvider->setMouse({0,0});
-        //! [Create the shader material]
-        Ra::Core::Asset::RawShaderMaterialData mat {"Quad Material", defaultConfig, paramProvider};
-
-        //! [Create a geometry component using the custom material]
-        auto c = new Ra::Engine::TriangleMeshComponent( "Quad Mesh", e, std::move( quad ), &mat);
-        //! [Register the entity/component association to the geometry system ]
-        auto system = app.m_engine->getSystem( "GeometrySystem" );
-        system->addComponent( e, c );
-
-        //![get the renderobject for further edition]
-        auto ro = Ra::Engine::RadiumEngine::getInstance()->getRenderObjectManager()->getRenderObject(
-            c->m_renderObjects[0] );
-        // Initialize all OpenGL state for the scene content
-        app.m_mainWindow->postLoadFile( "Cube" );
-        app.askForUpdate();
-        return ro;
-}
+class MainWindowFactory : public Ra::GuiBase::BaseApplication::WindowFactory
+{
+  public:
+   using Ra::GuiBase::BaseApplication::WindowFactory::WindowFactory;
+    Ra::GuiBase::MainWindowInterface* createMainWindow() const override {
+        return new MainWindow();
+    }
+};
 
  int main( int argc, char* argv[] ) {
-    Ra::GuiBase::BaseApplication app( argc, argv, Ra::GuiBase::SimpleWindowFactory{} );
-    //! [add the custom material to the material system]
-    Ra::Engine::RawShaderMaterial::registerMaterial();
-    int w,h;
-    auto ro = initQuad( app);
-    app.askForUpdate();
- //   std::cout<<w<<std::endl;
-    auto viewer = app.m_mainWindow->getViewer();
-  //  auto camera = new CameraManipulator2D( *( viewer->getCameraManipulator() ));
-  //  viewer->setCameraManipulator(camera);
 
-    for(int i = 0; i<20; i++){
-    const auto r  =  viewer->getCameraManipulator()->getCamera()->getRayFromScreen({10+i,25+i});
-   // const auto tmp =   camera->getCamera()->unProject({25,122});
-   // std::cout<<"yo"<<tmp<<std::endl;
-
-   //    std::cout<<r.pointAt(1)<<std::endl;
-     std::vector<Scalar> t;
-    // {0,0,0} a point and {0,1,0} the normal
-  /*  if ( Ra::Core::Geometry::RayCastPlane( r, {0, 0, 0}, {0, 1, 0}, t ) )
-    {
-        // vsPlane return at most one intersection t
-   //     std::cout<<"hehe"<<t[1]<<std::endl;
-        auto worldPos = r.pointAt( t[0] );
-        std::cout<<"nehe "<<i<<worldPos<<std::endl;
-        // if the brush /*is touching the paper;
-        auto paperPos = ro->getTransform().inverse()*worldPos;
-       // std::cout<<ro->getTransform().inverse().matrix()<<std::endl;
-       std::cout<<"hihi"<<i<<";"<<paperPos.y()<<std::endl;
-       std::cout<<"hoho"<<i<<";"<<paperPos.x()<<std::endl;
-       std::cout<<"haha"<<i<<";"<<paperPos.z()<<std::endl;
-    }*/
-}
-
-
-
-    QDockWidget* dock = new QDockWidget("Load Dataset");
-   // std::cout<<projetMatrix<<std::endl;
-    auto widget = new LoadFolderWidget(ro, viewer->getRenderer(),pathRaw,pathUnet, paramProvider,viewer,dock);
-    Content tmp(widget,ro, viewer->getRenderer(), paramProvider,viewer);
-    dock->setWidget(tmp.getLoadFolderWidget());
-   // app.askForUpdate();
-    app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
-
-    /*QDockWidget* dock2 = new QDockWidget("Mesh Paint");
-    dock2->setWidget( new Segmentation(dock2));
-    app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock2);*/
-
-
-
-  //  Ra::GuiBase::BaseApplication app( argc, argv,Ra::GuiBase::SimpleWindowFactory{} );
-    /*auto viewer = app.m_mainWindow->getViewer();
-    viewer->setCameraManipulator(
-        new CameraManipulator2D( *( viewer->getCameraManipulator() ) ) );
-      */
-   // QDockWidget* dock = new QDockWidget("Segmentation");
-    //QMainWindow* a = new QMainWindow(app)
-   // dock->setWidget(new Segmentation(dock) );
-    //app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
-    /* QApplication app(argc, argv);
-
-      Segmentation window;
-
-      window.setGeometry(300, 300,800, 600);
-      window.setWindowIcon(QIcon("C:/Users/aduongng/Desktop/project/App/Radium-Apps/ShaderEditor/image131.bmp"));
-      window.setWindowTitle("Segmentation");
-      window.show();
-*/
-
-
-    /*Ra::GuiBase::BaseApplication app( argc, argv, Ra::GuiBase::SimpleWindowFactory{} );
-    app.setContinuousUpdate( false );
-    QDockWidget* dock = new QDockWidget("Segmentation");*/
-    // dock->setWidget(new Segmentation(dock) );
-     //app.m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dock);
-    return app.exec();
+     Ra::MainApplication app( argc, argv, MainWindowFactory() );
+     app.setContinuousUpdate( false );
+     return app.exec();
 }
