@@ -190,7 +190,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event){
                        paramProvider1->setMouse({paperPos.x(),paperPos.y()});
                        auto tmp1 = (int)((paperPos.x()+1)*paramProvider1->getTextureUnet()->width()/2);
                        auto tmp2 = (int)((paperPos.y()*-1+1)*paramProvider1->getTextureUnet()->height()/2);
-                       image.setPixel(tmp1,tmp2,Qt::white);
+                       image.setPixelColor(tmp1,tmp2,Qt::white);
                        image.save(QString::fromStdString(paramProvider1->getPathUnet()));
                     // mainApp->getEngine()->getInstance()->pushFboAndViewport();
                     // gl45core::glViewport( 0, 0, int(m_viewer->width()), int( m_viewer->height() ));
