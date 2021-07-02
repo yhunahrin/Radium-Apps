@@ -1,13 +1,14 @@
 #include "Content.h"
-Content::Content(std::shared_ptr< Ra::Engine::RenderObject > ro,Ra::Engine::Renderer * renderer, std::shared_ptr< MyParameterProvider  > paramProvider,std::string pathRaw,
-                 std::string pathCNN ):
+Content::Content(std::shared_ptr< Ra::Engine::RenderObject > ro,Ra::Engine::Renderer * renderer, std::shared_ptr< MyParameterProvider  > paramProvider,const std::string &pathRaw,
+                 const std::string &pathCNN, int count ):
     _ro (ro),
     _renderer(renderer),
     _paramProvider(paramProvider),
     _pathRaw(pathRaw),
-    _pathCNN(pathCNN){}
+    _pathCNN(pathCNN),
+    _count(count){}
 
-std::shared_ptr< Ra::Engine::RenderObject > Content::getRenderObject(){
+const std::shared_ptr< Ra::Engine::RenderObject >& Content::getRenderObject() const{
     return _ro;
 }
 
@@ -19,12 +20,19 @@ std::shared_ptr< MyParameterProvider  > Content::getParameterProvider(){
     return _paramProvider;
 }
 
-std::string Content::getPathRaw(){
+const std::string& Content::getPathRaw()const{
     return _pathRaw;
 }
 
-std::string Content::getPathCNN(){
+const std::string& Content::getPathCNN()const{
     return _pathCNN;
+}
+
+void Content::setCount(const int &count){
+    _count =count;
+}
+const int&  Content::getCount() const{
+    return _count;
 }
 
 void Content::setRenderObject(std::shared_ptr< Ra::Engine::RenderObject > ro){
@@ -38,11 +46,11 @@ void Content::setParameterProvider(std::shared_ptr< MyParameterProvider  > param
     _paramProvider = paramProvider;
 }
 
-void Content::setPathRaw(std::string pathRaw){
-    _pathRaw = pathRaw;
+void Content::setPathRaw(const std::string &pathRaw){
+     _pathRaw = pathRaw;
 }
 
-void  Content::setPathCNN(std::string pathCNN){
+void  Content::setPathCNN(const std::string &pathCNN){
     _pathCNN = pathCNN;
 }
 
@@ -96,7 +104,7 @@ std::string Content::textDataRaw(QStringList *pathFull, QDir directoryRaw, QStri
            textDataset+=p;
            textDataset+="\",\n";
            textDataset+="            \"itemtype\" : \"";
-           p = strtok(NULL, "\eof");
+           p = strtok(NULL, "\\eof");
            textDataset+=p;
            textDataset+="\",\n";
            QImageReader reader;
@@ -121,12 +129,13 @@ std::string Content::textDataRaw(QStringList *pathFull, QDir directoryRaw, QStri
     textDataset+="               ]\n";
     textDataset+="  }\n";
     textDataset+="}";
-    std::cout<<"hihi"<<pathFull->size()<<std::endl;
+   // std::cout<<"hihi"<<pathFull->size()<<std::endl;
     return textDataset;
 }
 
 void Content::listPathFull(QStringList *pathList, QDir directory,QStringList nameList){
     pathList->clear();
+    std::cout<<"hhi"<<nameList.size()<<std::endl;
     for (int i=0; i<nameList.size();i++){
         pathList->append(directory.path()+"/"+nameList.at(i));
     }
@@ -210,6 +219,80 @@ std::string Content::methodeUnet(QDir directoryRaw, QDir directoryCNN, QStringLi
     textMethod+="}\n";
     return textMethod;
 }
+
+Ra::Engine::TextureParameters Content::getTextureParameterFromPath(std::string path){
+    Ra::Engine::TextureManager _textureM;
+    return _textureM.addTexture(path,0,0,nullptr);
+}
+QImage Content::getImageFromPath(std::string path){
+    QImageReader reader;
+    QSettings settings;
+    reader.setFileName(QString::fromStdString(path));
+    return reader.read();
+}
+
+int  Content::findIndex(QString str, QStringList str1){
+    for(int i=0; i<str1.size();i++){
+        if(str==str1.at(i))
+            return i;
+    }
+    return -1;
+}
+
+QString Content::strMax(QStringList list){
+    int i = 0;
+    QString max=list.at(i);
+    for(i=1;i<list.size();i++)
+        {
+             if(strcmp(list.at(i).toStdString().c_str(),max.toStdString().c_str())==1)
+                 max=list.at(i);
+        }
+    return max;
+}
+
+QStringList Content::listFiltre(QStringList nameList){
+    QStringList tmp,tmp2;
+    tmp.clear();
+    tmp2.clear();
+    char*dot;
+    for(int i=0;i<nameList.size();i++){
+        char*p;
+        std::string tmp4 = nameList.at(i).toStdString();
+        char *tmp5 = const_cast<char*>(tmp4.c_str());
+        p = strtok(tmp5, ".");
+        nameList[i]=p;
+        p = strtok(NULL, "\\eof");
+        dot = p;
+    }
+    for(int i =0; i<nameList.size();i++){
+        if(strchr(nameList.at(i).toStdString().c_str(),'_')==NULL)
+            tmp.append(nameList.at(i));
+        else
+            tmp2.append(nameList.at(i));
+    }
+    for(int i =0; i<tmp.size();i++){
+        QStringList tmp3;
+        tmp3.clear();
+        for(int j=0; j<tmp2.size();j++){
+            std::cout<<tmp2.at(j).toStdString().c_str()<<std::endl;
+             std::cout<<tmp.at(i).toStdString().c_str()<<std::endl;
+            if(strstr(tmp2.at(j).toStdString().c_str(),tmp.at(i).toStdString().c_str())!=NULL){
+                    tmp3.append(tmp2.at(j));
+            }
+        }
+        if(tmp3.size()!=0){
+            tmp[i]=strMax(tmp3);
+        }
+    }
+    for(int i=0;i<tmp.size();i++){
+      tmp[i]+=".";
+      tmp[i]+=dot;
+    }
+    return tmp;
+}
+
+
 Content::~Content(){
 
 }
+

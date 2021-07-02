@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>553</width>
+    <width>606</width>
     <height>651</height>
    </rect>
   </property>
@@ -23,20 +23,30 @@
       <string>Load Folder Image</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="0" colspan="4">
+      <item row="3" column="0" colspan="2">
        <widget class="QGroupBox" name="imageOrgine">
         <property name="title">
-         <string>Image Origine</string>
+         <string>Image Ultrasound</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="2" column="2">
-          <widget class="QPushButton" name="buttonRunImage">
+         <item row="2" column="0" colspan="3">
+          <widget class="QListView" name="listView"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="listImageOrigine">
            <property name="text">
-            <string>Run</string>
+            <string>List: </string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="0" column="1">
+          <widget class="QPushButton" name="buttonRunImage">
+           <property name="text">
+            <string>Load Ultrasound</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
           <widget class="QComboBox" name="boxListImageOrigine">
            <property name="maximumSize">
             <size>
@@ -46,95 +56,33 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="listImageOrigine">
-           <property name="text">
-            <string>List: </string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QLabel" name="labelDataset">
-           <property name="text">
-            <string>dataset.json</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="3">
-          <widget class="QTextEdit" name="textDatasetJson"/>
-         </item>
         </layout>
        </widget>
       </item>
-      <item row="4" column="0" colspan="4">
+      <item row="4" column="0" colspan="2">
        <widget class="QGroupBox" name="loadUnet">
         <property name="title">
-         <string>CNN</string>
+         <string>Image Segmented</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0">
-          <widget class="QRadioButton" name="checkUnet">
+         <item row="0" column="1">
+          <widget class="QPushButton" name="buttonRunUnet">
            <property name="text">
-            <string>Unet</string>
+            <string>Load Segmented</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QLabel" name="labelMethod">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
            <property name="text">
-            <string>method.json</string>
+            <string>List:</string>
            </property>
           </widget>
          </item>
          <item row="0" column="2">
-          <widget class="QRadioButton" name="checkCNN3">
-           <property name="text">
-            <string>CNN3</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QRadioButton" name="checkCNN2">
-           <property name="text">
-            <string>CNN2</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="3">
-          <widget class="QTextEdit" name="textMethodeJson"/>
-         </item>
-         <item row="4" column="2">
-          <widget class="QPushButton" name="buttonRunUnet">
-           <property name="text">
-            <string>Run</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
           <widget class="QComboBox" name="boxImageUnet"/>
          </item>
         </layout>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="buttonLoad">
-        <property name="text">
-         <string>Load Data</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QRadioButton" name="buttonShow">
-        <property name="text">
-         <string>Show Image</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QRadioButton" name="buttonJson">
-        <property name="text">
-         <string>Save Json</string>
-        </property>
        </widget>
       </item>
      </layout>

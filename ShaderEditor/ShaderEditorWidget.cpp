@@ -105,7 +105,7 @@ void ShaderEditorWidget::loadData()
     }
     else if (res == QMessageBox::No){
         QDir directory = QFileDialog::getExistingDirectory(this, "Select Directory");
-        QStringList pathList = directory.entryList(QStringList() << "*.jpg" << "*.JPG" << "*.png" << "*.PNG" << "*.bmp" << "*.BMP",QDir::Files);
+        QStringList pathList = directory.entryList(QStringList() << "*.png" << "*.PNG",QDir::Files);
         QStringList pathListFull;
         for (int i=0; i<pathList.size();i++){
             pathListFull.append(directory.path()+"/"+pathList.at(i));

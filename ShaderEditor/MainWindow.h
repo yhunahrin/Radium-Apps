@@ -27,11 +27,15 @@
 #include <MainApplication.hpp>
 
 #include "ui_MainWindow.h"
+#include "Segmentation.h"
+#include "SliceViewerWidget.h"
 #include <QMainWindow>
 
 #include <QEvent>
 #include <qdebug.h>
-
+#include <MeshPaintUI.h>
+#include <QSettings>
+#include <QShortcut>
 namespace Ra {
 namespace Engine {
 class Entity;
@@ -94,8 +98,23 @@ class MainWindow : public Ra::GuiBase::MainWindowInterface, private Ui::MainWind
 
     void saveTexture();
     void saveAsTexture();
+    void manipuSegementation();
+    void programPython();
+    void closeEvent(QCloseEvent *event) override;
+    void buttonNext();
+    void buttonPrev();
+    void sliceViewer();
+    void loadSlicesXY();
+    void loadSlicesXZ();
+    void loadSlicesZY();
+    int gridLayout(int grid, QVector <Ra::Engine::Dataset> &DatasetRaw,  QVector <Ra::Engine::Dataset> &DatasetCNN);
+    void grid1();
+    void grid2();
+    void grid4();
+    void grid8();
 private:
     Ra::Gui::Viewer* m_viewer{ nullptr };
+    Ra::Gui::Viewer* m_viewer2{ nullptr };
    // Ra::Engine::Renderer * _renderer;
     /// Stores the internal model of engine objects for selection and visibility.
     Ra::GuiBase::ItemModel* m_itemModel{nullptr};
@@ -105,9 +124,22 @@ private:
     QWidget* m_viewerwidget;
     /// Widget to allow mm_viewerwidgetaterial edition.
     LoadFolderWidget * m_LoadFolder;
+    SliceViewerWidget * m_SliceViewer;
+    MeshPaintUI * m_Meshpaint;
+    QLabel *label;
     QImage image;
+    Ra::Gui::PickingManager* m_PickingManager;
+    Ra::Core::Utils::Color m_paintColor;
+    QString pathProgPy;
+    QVector<QPoint> pt;
+    QPixmap pix;
+    QPoint * pt1;
+    int grid =1;
 protected:
    bool eventFilter(QObject *obj, QEvent *evt);
+   void onSelectionChanged();
+   void saveSetting();
+   void loadSetting();
 };
 //}}
 #endif // MAINWINDOW_H
