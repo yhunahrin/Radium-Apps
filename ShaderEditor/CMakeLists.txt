@@ -30,10 +30,12 @@ set(app_sources
         main.cpp
         ShaderEditorWidget.cpp
         MeshPaintUI.cpp
+        Segmentation.cpp
         LoadFolderWidget.cpp
         Content.cpp
         MainWindow.cpp
         MainApplication.cpp
+        SliceViewerWidget.cpp
     )
 
 set(app_headers
@@ -41,8 +43,10 @@ set(app_headers
     ShaderEditorWidget.hpp
     MyParameterProvider.hpp
     MeshPaintUI.h
+    Segmentation.h
     MeshPaintPluginMacros.h
     LoadFolderWidget.h
+    SliceViewerWidget.h
     Content.h
     MainWindow.h
     MainApplication.hpp
@@ -51,8 +55,10 @@ set(app_headers
 set(app_uis
     ShaderEditorWidget.ui
     MeshPaintUI.ui
+    Segmentation.ui
     LoadFolderWidget.ui
     MainWindow.ui
+    SliceViewerWidget.ui
    )
 
 qt5_wrap_ui(app_uis_moc ${app_uis})
